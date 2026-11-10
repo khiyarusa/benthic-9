@@ -1,4 +1,4 @@
-﻿# وضعیت پروژه BENTHIC-9
+# وضعیت پروژه BENTHIC-9
 
 آخرین به‌روزرسانی: ۱۰ نوامبر ۲۰۲۶
 
@@ -58,8 +58,12 @@
 | `tsc --noEmit` | ✅ بدون خطا |
 | `vitest run` | ✅ ۱۶ از ۱۶ |
 | `playwright test` | ✅ ۲ از ۲ (Edge) |
-| `vite build` | ✅ ۳ ثانیه، ۱٬۷ MB JS |
-| `gradlew assembleDebug` | ⏳ در CI |
+| `vite build` | ✅ ۱٬۷ MB JS |
+| GitHub CI (push) | ✅ run 42895139387 |
+| GitHub Android (push) | ✅ run 42895139374 |
+| GitHub Android (release) | ✅ run 42895662034 |
+| APK دیباگ | ✅ ۴٬۷۵۲٬۶۲۵ بایت — SHA-256 `9F0B4A2E…B710B4B1` |
+| آزمون روی دستگاه واقعی | ⏳ انجام نشده |
 
 ## تصمیم‌های فنی مهم
 
