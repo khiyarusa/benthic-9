@@ -59,8 +59,14 @@ export function stepThermal(state: GameState, dtMin: number, roomFactor: Record<
     let deltaT = (heat * 60 * dtMin) / (mass * KJ_PER_KG_K);
 
     // heat exchange with the 4°C ocean through the hull
-    const exchange = 0.014 * dtMin * (volume / 300);
+    const exchange = 0.055 * dtMin * (volume / 300);
     deltaT -= (room.tempC - state.thermal.ambientC) * exchange;
+
+    // life support also runs the air handlers that even out the station temperature
+    const lifeFactor = roomFactor.life ?? 0;
+    if (lifeFactor > 0.2) {
+      deltaT += (20 - room.tempC) * 0.02 * lifeFactor * dtMin;
+    }
 
     const cooling = localCooling[room.id] + passiveCooling * (volume / totalVolume);
     if (cooling > 0 && room.tempC > 15) {
@@ -104,11 +110,11 @@ export function stepThermal(state: GameState, dtMin: number, roomFactor: Record<
     if (temp < 6) {
       member.health -= (6 - temp) * 0.05 * dtMin;
       member.stress = clamp(member.stress + 0.12 * dtMin, 0, 100);
-    } else if (temp > 33) {
-      member.health -= (temp - 33) * 0.045 * dtMin;
+    } else if (temp > 35) {
+      member.health -= (temp - 35) * 0.05 * dtMin;
       member.stress = clamp(member.stress + 0.15 * dtMin, 0, 100);
     }
-    if (m.bioluminescence && temp >= 6 && temp <= 33) {
+    if (m.bioluminescence && temp >= 6 && temp <= 35) {
       member.stress = clamp(member.stress - 0.01 * dtMin, 0, 100);
     }
   }

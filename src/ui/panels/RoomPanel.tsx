@@ -230,6 +230,24 @@ export function RoomPanel({ roomId }: { roomId: RoomId }) {
 
       {tab === 'repairs' ? (
         <div style={{ marginTop: 8 }}>
+          <div className="stat-line">
+            <span>
+              یکپارچگی سازهٔ اتاق
+              <br />
+              <small style={{ color: 'var(--muted)' }}>
+                {faPercent(room.hull, 1)} • هر تقویت ۳ کیلوگرم قطعه و ۲۲٪ سازه
+              </small>
+            </span>
+            <button
+              type="button"
+              className="btn btn--sm"
+              onClick={() => bestEngineer && sim.assignTask(bestEngineer.id, { kind: 'weld', room: roomId, progress: 0 })}
+              disabled={room.hull >= 100 || state.resources.partsKg < 3 || room.breached}
+            >
+              تقویت بدنه
+            </button>
+          </div>
+
           {room.breached ? (
             <div className="alert alert--critical" style={{ marginBottom: 8 }}>
               <span className="alert__dot" />

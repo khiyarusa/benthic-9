@@ -80,6 +80,9 @@ export function CrewPanel() {
           {member.task.kind === 'seal' ? (
             <MetricBar label="پیشرفت مهار" value={member.task.progress} display={faPercent(member.task.progress)} tone="good" />
           ) : null}
+          {member.task.kind === 'weld' ? (
+            <MetricBar label="پیشرفت تقویت" value={member.task.progress} display={faPercent(member.task.progress)} tone="good" />
+          ) : null}
         </div>
       ))}
 

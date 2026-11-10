@@ -15,6 +15,8 @@ export function describeTask(state: GameState, member: CrewMember): string {
       return `${member.travelTo ? 'در مسیر' : 'در حال'} مهار ترک «${ROOM_LABEL[task.room]}»${travel}`;
     case 'pump':
       return `${member.travelTo ? 'در مسیر' : 'در حال'} تخلیهٔ آب «${ROOM_LABEL[task.room]}»${travel}`;
+    case 'weld':
+      return `${member.travelTo ? 'در مسیر' : 'در حال'} تقویت بدنهٔ «${ROOM_LABEL[task.room]}»${travel}`;
     case 'research': {
       const node = nodeById(task.nodeId);
       return `${member.travelTo ? 'در مسیر' : 'در حال'} پژوهش «${node?.label ?? '—'}»${travel}`;

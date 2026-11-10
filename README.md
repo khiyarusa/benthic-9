@@ -3,7 +3,11 @@
 شبیه‌سازی بقا و مدیریت ایستگاه تحقیقاتی در عمق ۵۸۰۰ متری اقیانوس آرام.
 بازی ابتدا وب است و با Capacitor به اپلیکیشن اندروید (فقط افقی) تبدیل می‌شود.
 
-![نمای ایستگاه](docs/screenshots/phone-game.png)
+![نمای ایستگاه](docs/screenshots/phone-station.png)
+
+| نمای ایستگاه | پنل پژوهش |
+|---|---|
+| ![پنل ایستگاه](docs/screenshots/phone-overview.png) | ![پژوهش](docs/screenshots/phone-research.png) |
 
 ## اجرا
 

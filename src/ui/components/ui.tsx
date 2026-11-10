@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { faPercent } from '../../sim/format';
 
 type Tone = 'default' | 'good' | 'warn' | 'danger';
 
@@ -44,7 +45,7 @@ export function MetricBar({
       <div className={`bar ${barTone}`}>
         <div className="bar__fill" style={{ width: `${pct}%` }} />
       </div>
-      <span className="bar-row__value">{display ?? `${Math.round(pct)}٪`}</span>
+      <span className="bar-row__value">{display ?? faPercent(pct)}</span>
     </div>
   );
 }

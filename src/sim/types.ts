@@ -86,6 +86,7 @@ export type CrewTask =
   | { kind: 'repair'; equipmentId: string; progress: number }
   | { kind: 'pump'; room: RoomId }
   | { kind: 'seal'; room: RoomId; progress: number }
+  | { kind: 'weld'; room: RoomId; progress: number }
   | { kind: 'research'; nodeId: string }
   | { kind: 'rest' }
   | { kind: 'idle' };

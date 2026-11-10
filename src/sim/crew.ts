@@ -52,6 +52,23 @@ function claimedEquipment(state: GameState, exceptId: string): Set<string> {
   return claimed;
 }
 
+function taskKey(task: CrewTask): string {
+  switch (task.kind) {
+    case 'repair':
+      return `repair:${task.equipmentId}`;
+    case 'seal':
+      return `seal:${task.room}`;
+    case 'weld':
+      return `weld:${task.room}`;
+    case 'pump':
+      return `pump:${task.room}`;
+    case 'research':
+      return `research:${task.nodeId}`;
+    default:
+      return task.kind;
+  }
+}
+
 function chooseTask(state: GameState, member: CrewMember): CrewTask {
   const claimed = claimedEquipment(state, member.id);
 
@@ -78,6 +95,14 @@ function chooseTask(state: GameState, member: CrewMember): CrewTask {
     return { kind: 'pump', room: flooded[0]!.id };
   }
 
+  const weakest = Object.values(state.rooms)
+    .filter((room) => !room.breached && room.hull < 70)
+    .filter((room) => !state.crew.some((c) => c.id !== member.id && c.task.kind === 'weld' && c.task.room === room.id))
+    .sort((a, b) => a.hull - b.hull);
+  if (weakest.length > 0 && member.skills.engineering >= 2 && state.resources.partsKg >= 3) {
+    return { kind: 'weld', room: weakest[0]!.id, progress: 0 };
+  }
+
   if (state.research.activeNodeId && member.energy > 25) {
     return { kind: 'research', nodeId: state.research.activeNodeId };
   }
@@ -94,6 +119,8 @@ function taskRoom(state: GameState, task: CrewTask): RoomId | null {
     }
     case 'pump':
     case 'seal':
+      return task.room;
+    case 'weld':
       return task.room;
     case 'research':
       return RESEARCH_ROOM[state.research.activeNodeId ?? ''] ?? 'geolab';
@@ -135,7 +162,11 @@ export function stepCrew(state: GameState, dtMin: number, roomFactor: Record<Roo
 
     if (!member.room) continue;
 
-    if (member.autoTask) member.task = chooseTask(state, member);
+    if (member.autoTask) {
+      const next = chooseTask(state, member);
+      // Re-planning must not wipe progress: only replace the task when the target changed.
+      if (taskKey(next) !== taskKey(member.task)) member.task = next;
+    }
 
     const requiredRoom = taskRoom(state, member.task);
     if (requiredRoom && requiredRoom !== member.room) {
@@ -211,6 +242,29 @@ export function stepCrew(state: GameState, dtMin: number, roomFactor: Record<Roo
         if (target.water <= 1) member.task = { kind: 'idle' };
         break;
       }
+      case 'weld': {
+        const target = state.rooms[member.task.room];
+        frame.repairing += 1;
+        const speed = (1.5 + engineering * 0.7) * skillFactor * (m.autoWeld ? 1.5 : 1);
+        member.task.progress = clamp(member.task.progress + speed * dtMin, 0, 100);
+        if (member.task.progress >= 100) {
+          if (state.resources.partsKg >= 3) {
+            state.resources.partsKg -= 3;
+            target.hull = clamp(target.hull + 22, 0, 100);
+            state.stats.repairs += 1;
+            state.incidentLog.push({
+              minute: state.minute,
+              text: `${member.name} بدنهٔ «${ROOM_LABEL[target.id]}» را تقویت کرد.`,
+              severity: 'info',
+            });
+            member.task = { kind: 'idle' };
+            member.energy = clamp(member.energy - 3, 0, 100);
+          } else {
+            member.task.progress = 85;
+          }
+        }
+        break;
+      }
       case 'research': {
         frame.researching += 1;
         const biology = member.skills.biology;
@@ -250,10 +304,15 @@ export function stepCrew(state: GameState, dtMin: number, roomFactor: Record<Roo
     }
 
     if (member.stress > 88) member.health = clamp(member.health - 0.03 * dtMin, 0, 100);
+  }
 
-    if (member.health <= 0) {
+  // Deaths are resolved for everyone, including crew who spent the tick in transit.
+  for (const member of state.crew) {
+    if (member.alive && member.health <= 0) {
       member.health = 0;
       member.alive = false;
+      member.room = null;
+      member.travelTo = null;
       state.incidentLog.push({
         minute: state.minute,
         text: `${member.name} جان خود را در ایستگاه از دست داد.`,
