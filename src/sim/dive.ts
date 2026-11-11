@@ -25,7 +25,8 @@ export function applyDiveResult(state: GameState, result: DiveResult): { samples
 
   const locked: string[] = [];
   for (const id of result.discoveries) {
-    const key = `codex.${id}`;
+    // scans share one codex entry; clues keep one flag each
+    const key = id.startsWith('scan-') ? `codex.${id}` : `codex.${id}`;
     if (!state.flags[key]) {
       state.flags[key] = true;
       locked.push(id);

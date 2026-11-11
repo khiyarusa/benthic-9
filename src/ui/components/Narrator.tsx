@@ -15,7 +15,7 @@ export function Narrator() {
       if (!detail?.id) return;
       setLineId(detail.id);
       window.clearTimeout(timer);
-      timer = window.setTimeout(() => setLineId(null), 9000);
+      timer = window.setTimeout(() => setLineId(null), 7000);
     };
     window.addEventListener('voice:line', onLine);
     return () => {

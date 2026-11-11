@@ -20,7 +20,10 @@ export function CrewPanel() {
         <div key={member.id} className="card" style={{ marginBottom: 8, opacity: member.alive ? 1 : 0.5 }}>
           <div className="row row--between" style={{ alignItems: 'flex-start' }}>
             <div className="crew-card" style={{ border: 'none', background: 'transparent', padding: 0 }}>
-              <div className="crew-avatar">{member.name.slice(0, 1)}</div>
+              <div className="crew-avatar crew-avatar--photo">
+                <img src={`crew/crew-${member.id}.webp`} alt={member.name} loading="lazy" />
+                {member.alive ? null : <span className="crew-avatar__dead">از دست رفته</span>}
+              </div>
               <div>
                 <div className="crew-card__name">{member.name}</div>
                 <div className="crew-card__role">{member.role}</div>

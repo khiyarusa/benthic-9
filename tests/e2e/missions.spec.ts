@@ -25,7 +25,7 @@ test.describe('campaign direction and codex', () => {
     await page.locator('.sheet__close').first().click();
 
     await page.locator('.navbar .nav-btn[data-panel="codex"]').click();
-    await expect(page.locator('.codex-card')).toHaveCount(10);
+    await expect(page.locator('.codex-card')).toHaveCount(11);
     await expect(page.locator('.codex-card--locked').first()).toBeVisible();
     await page.locator('.sheet__close').first().click();
 

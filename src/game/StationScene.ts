@@ -5,6 +5,7 @@ import { sim } from '../state/store';
 import { selectRoom, setRoomFocusHandler } from './bridge';
 import { computeLayout, type Rect, type StationLayout } from './layout';
 import { paintRoom } from './art/rooms';
+import { paintCrewDisc, paintRoomPhoto } from './art/roomArt';
 import { paintBackdrop, paintBeams, paintExterior, paintGrade, paintInnerShadow, paintShell } from './art/vessel';
 import { CREW_FRAME, CREW_FRAMES, paintCrewSheet, type CrewLook } from './art/crew';
 import { C } from './art/painter';
@@ -51,6 +52,7 @@ export class StationScene extends Phaser.Scene {
   private labels = new Map<RoomId, Phaser.GameObjects.Text>();
   private roomImages = new Map<RoomId, Phaser.GameObjects.Image>();
   private crewSprites = new Map<string, Phaser.GameObjects.Sprite>();
+  private crewPhotos = new Map<string, Phaser.GameObjects.Image>();
   private cracks = new Map<RoomId, Crack[]>();
   private fish: { sprite: Phaser.GameObjects.Image; speed: number; phase: number }[] = [];
   private selected: RoomId | null = null;
@@ -63,6 +65,12 @@ export class StationScene extends Phaser.Scene {
 
   constructor() {
     super('station');
+  }
+
+  preload(): void {
+    // Photographic 2.5D renders replace the vector cutaway art when present.
+    for (const id of ROOM_ORDER) this.load.image(`photo-${id}`, `rooms/${id}.webp`);
+    for (const id of ['c1', 'c2', 'c3', 'c4']) this.load.image(`photo-crew-${id}`, `crew/crew-${id}.webp`);
   }
 
   create(): void {
@@ -141,6 +149,7 @@ export class StationScene extends Phaser.Scene {
     this.labels.clear();
     this.roomImages.clear();
     this.crewSprites.clear();
+    this.crewPhotos.clear();
     this.fish = [];
     this.cracks.clear();
     this.staticTextures.forEach((key) => {
@@ -164,7 +173,13 @@ export class StationScene extends Phaser.Scene {
 
     for (const id of ROOM_ORDER) {
       const rect = this.layout.rooms[id];
-      const canvas = paintRoom(id, Math.round(rect.w), Math.round(rect.h));
+      const photoKey = `photo-${id}`;
+      const photo = this.textures.exists(photoKey)
+        ? (this.textures.get(photoKey).getSourceImage() as HTMLImageElement)
+        : null;
+      const canvas = photo
+        ? paintRoomPhoto(photo, rect.w, rect.h)
+        : paintRoom(id, Math.round(rect.w), Math.round(rect.h));
       const key = this.textureKey('room', id);
       this.addCanvasTexture(key, canvas);
       const image = this.add.image(rect.x, rect.y, key).setOrigin(0, 0);
@@ -198,7 +213,7 @@ export class StationScene extends Phaser.Scene {
         fontSize: `${size}px`,
         color: '#bfe6ef',
         padding: { top: 1, bottom: 2, left: 4, right: 4 },
-        backgroundColor: 'rgba(2, 14, 20, 0.72)',
+        backgroundColor: 'rgba(2, 12, 17, 0.86)',
       })
       .setOrigin(0, 0)
       .setResolution(Math.max(1, this.dpr));
@@ -229,6 +244,20 @@ export class StationScene extends Phaser.Scene {
   private spawnCrew(): void {
     const state = sim.state;
     state.crew.forEach((member, index) => {
+      const photoKey = `photo-crew-${member.id}`;
+      if (this.textures.exists(photoKey)) {
+        const img = this.textures.get(photoKey).getSourceImage() as HTMLImageElement;
+        const discKey = `disc-${member.id}`;
+        if (!this.textures.exists(discKey)) {
+          const rings = ['#4fe0e6', '#6fe3a6', '#ffb454', '#c9a0ff'];
+          this.addCanvasTexture(discKey, paintCrewDisc(img, 96, rings[index % rings.length]!));
+        }
+        const marker = this.add.image(-100, -100, discKey).setDepth(6);
+        marker.setScale(0.34);
+        this.crewLayer.add(marker);
+        this.crewPhotos.set(member.id, marker);
+        return;
+      }
       const look = CREW_LOOKS[index % CREW_LOOKS.length]!;
       const key = `crew-${index}`;
       if (!this.textures.exists(key)) {
@@ -417,6 +446,24 @@ export class StationScene extends Phaser.Scene {
   private updateCrew(state: GameState): void {
     const dt = 1 / 20;
     state.crew.forEach((member, index) => {
+      const marker = this.crewPhotos.get(member.id);
+      if (marker) {
+        if (!member.alive) {
+          marker.setVisible(false);
+          return;
+        }
+        marker.setVisible(true);
+        const room = member.travelTo ?? member.room ?? 'corridor';
+        const rect = this.layout.rooms[room] ?? this.layout.rooms.corridor;
+        const spread = Math.min(rect.w * 0.36, 46);
+        const targetX = rect.x + rect.w / 2 + ((index % 2 === 0 ? -1 : 1) * spread) / 2;
+        const targetY = rect.y + rect.h - 26;
+        marker.x += (targetX - marker.x) * Math.min(1, 0.16);
+        marker.y += (targetY - marker.y) * Math.min(1, 0.16);
+        const tired = member.energy < 25 || member.health < 50;
+        marker.setAlpha(tired ? 0.75 : 1);
+        return;
+      }
       const sprite = this.crewSprites.get(member.id);
       if (!sprite) return;
       if (!member.alive) {

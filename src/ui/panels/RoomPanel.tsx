@@ -43,8 +43,27 @@ export function RoomPanel({ roomId }: { roomId: RoomId }) {
     sim.assignTask(bestEngineer.id, { kind: 'repair', equipmentId, progress: 0 });
   };
 
+  const dark = !room.lightsOn;
+  const flood = Math.min(1, room.water / 60);
+
   return (
     <div>
+      <figure className="room-hero">
+        <img src={`rooms/${roomId}.webp`} alt={`نمای داخلی ${ROOM_LABEL[roomId]}`} loading="lazy" />
+        <div className="room-hero__scrim" />
+        {dark ? <div className="room-hero__dark" aria-hidden="true" /> : null}
+        {flood > 0.02 ? (
+          <div className="room-hero__flood" style={{ height: `${18 + flood * 52}%` }} aria-hidden="true" />
+        ) : null}
+        <figcaption>
+          <strong>{ROOM_LABEL[roomId]}</strong>
+          <span>
+            {CONDITION[condition].label} · {faPercent(room.hull)} بدنه
+            {room.water > 3 ? ` · آب ${faPercent(room.water)}` : ''}
+            {dark ? ' · چراغ خاموش' : ''}
+          </span>
+        </figcaption>
+      </figure>
       <div className="row row--between" style={{ marginBottom: 8 }}>
         <div className="row" style={{ gap: 6 }}>
           <Chip tone={CONDITION[condition].tone}>{CONDITION[condition].label}</Chip>

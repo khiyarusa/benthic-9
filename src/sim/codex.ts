@@ -45,6 +45,17 @@ export const CODEX: CodexEntry[] = [
     unlocked: (state) => state.stats.expeditions >= 1 && state.resources.samples >= 3,
   },
   {
+    id: 'scanned-fauna',
+    group: 'biology',
+    title: 'ثبت جانداران درجا',
+    body:
+      'سه جاندار در عمق‌های مختلف با سونار اسکن شدند. الگوی حرکت دو تای آن‌ها به نور چراغ پاسخ ' +
+      'معکوس می‌دهد: با روشن‌شدن چراغ فرار می‌کنند، با خاموش‌شدن نزدیک می‌شوند. یعنی اینجا نور ' +
+      'یک تهدید است، نه یک ابزار بی‌طرف.',
+    hint: 'با سونار سه جاندار را اسکن کن.',
+    unlocked: (state) => Object.keys(state.flags).filter((key) => key.startsWith('codex.scan-')).length >= 3,
+  },
+  {
     id: 'rift-basalt',
     group: 'geology',
     title: 'بازالت شکاف',
@@ -106,9 +117,9 @@ export const CODEX: CodexEntry[] = [
     unlocked: (state) => flag(state, 'clue-signal-1'),
   },
   {
-    id: 'nouri',
+    id: 'radmehr',
     group: 'crew',
-    title: 'گزارش فرمانده نوری',
+    title: 'گزارش فرمانده رادمهر',
     body:
       '«اگر این را می‌خوانی، یعنی من نتوانستم برگردم. سه سامانه را دستی نگه داشتم تا ایستگاه زنده ' +
       'بماند. تصمیم آخر با توست: بمان و نگه‌داری کن، یا برو و حقیقت را بیرون ببر.»',
@@ -116,9 +127,9 @@ export const CODEX: CodexEntry[] = [
     unlocked: (state) => state.stats.expeditions >= 3,
   },
   {
-    id: 'kaviani',
+    id: 'salahshour',
     group: 'crew',
-    title: 'یادداشت دکتر کاویانی',
+    title: 'یادداشت دکتر سلحشور',
     body:
       '«نمونه‌ها در فشار پایین می‌میرند. اگر می‌خواهیم چیزی ثابت کنیم، باید همان‌جا مطالعه کنیم. ' +
       'من می‌مانم؛ حتی اگر ایستگاه بالا نیاید.»',

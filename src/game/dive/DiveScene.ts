@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { paintCaustics, paintDarkness, paintRov, paintSeabed, makeTexSet, DIVE_THEMES, type DiveTheme } from './scenery';
+import { hazardsFor, paintCreature, paintHazardGlow, type HazardZone } from './hazards';
 import { surface } from '../art/painter';
 
 export interface DiveResult {
@@ -48,6 +49,16 @@ export class DiveScene extends Phaser.Scene {
   private dark!: Phaser.GameObjects.Image;
   private caustics!: Phaser.GameObjects.TileSprite;
   private pickups: Pickup[] = [];
+  private zones: HazardZone[] = [];
+  private creatures: Array<{
+    sprite: Phaser.GameObjects.Image;
+    vx: number;
+    vy: number;
+    kind: number;
+    scanned: boolean;
+    phase: number;
+  }> = [];
+  private zoneWarning = '';
   private target = new Phaser.Math.Vector2(0, 0);
   private velocity = new Phaser.Math.Vector2(0, 0);
   private battery = 100;
@@ -74,6 +85,9 @@ export class DiveScene extends Phaser.Scene {
     this.battery = Math.max(12, battery);
     this.hull = Math.max(20, hull);
     this.pickups = [];
+    this.zones = [];
+    this.creatures = [];
+    this.zoneWarning = '';
     this.samples = 0;
     this.dataPoints = 0;
     this.discoveries = [];
@@ -137,6 +151,8 @@ export class DiveScene extends Phaser.Scene {
     });
 
     this.makeLife();
+    this.makeHazards();
+    this.makeCreatures();
 
     this.startedAt = this.time.now;
     this.hudTimer = this.time.addEvent({ delay: 120, loop: true, callback: () => this.emitHud() });
@@ -190,20 +206,47 @@ export class DiveScene extends Phaser.Scene {
       this.textures.addCanvas('caustics', paintCaustics(256));
     }
     if (!this.textures.exists('pickup-sample')) {
-      const { canvas, ctx } = surface(10, 10);
-      ctx.fillStyle = '#6fe3a6';
-      ctx.fillRect(3, 0, 4, 10);
-      ctx.fillStyle = '#c9ffe2';
-      ctx.fillRect(4, 2, 2, 5);
+      // a soft biological glow with a bright core, so it reads at a glance
+      const { canvas, ctx } = surface(24, 24);
+      const halo = ctx.createRadialGradient(12, 12, 1, 12, 12, 12);
+      halo.addColorStop(0, 'rgba(160, 255, 205, 0.85)');
+      halo.addColorStop(0.45, 'rgba(111, 227, 166, 0.35)');
+      halo.addColorStop(1, 'rgba(111, 227, 166, 0)');
+      ctx.fillStyle = halo;
+      ctx.fillRect(0, 0, 24, 24);
+      ctx.fillStyle = '#e6fff1';
+      ctx.beginPath();
+      ctx.ellipse(12, 12, 3.4, 2.2, -0.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(200, 255, 230, 0.8)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(9, 13);
+      ctx.quadraticCurveTo(12, 16, 15, 13);
+      ctx.stroke();
       this.textures.addCanvas('pickup-sample', canvas);
     }
     if (!this.textures.exists('pickup-clue')) {
-      const { canvas, ctx } = surface(14, 14);
-      ctx.strokeStyle = '#4fe0e6';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(2.5, 2.5, 9, 9);
-      ctx.fillStyle = '#4fe0e6';
-      ctx.fillRect(6, 6, 2, 2);
+      // a data beacon: diamond outline with an inner ring
+      const { canvas, ctx } = surface(26, 26);
+      const halo = ctx.createRadialGradient(13, 13, 1, 13, 13, 13);
+      halo.addColorStop(0, 'rgba(79, 224, 230, 0.55)');
+      halo.addColorStop(1, 'rgba(79, 224, 230, 0)');
+      ctx.fillStyle = halo;
+      ctx.fillRect(0, 0, 26, 26);
+      ctx.strokeStyle = '#8ff2f7';
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(13, 3);
+      ctx.lineTo(23, 13);
+      ctx.lineTo(13, 23);
+      ctx.lineTo(3, 13);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(79, 224, 230, 0.9)';
+      ctx.beginPath();
+      ctx.arc(13, 13, 2.2, 0, Math.PI * 2);
+      ctx.fill();
       this.textures.addCanvas('pickup-clue', canvas);
     }
     if (!this.textures.exists('sonar')) {
@@ -257,12 +300,48 @@ export class DiveScene extends Phaser.Scene {
     }
   }
 
+  /** Named hazards, drawn as faint coloured water plus a warning in the HUD. */
+  private makeHazards(): void {
+    this.zones = hazardsFor(this.theme, WORLD_W, WORLD_H);
+    for (const zone of this.zones) {
+      const key = `zone-${zone.kind}`;
+      if (!this.textures.exists(key)) {
+        const { canvas, ctx } = surface(128, 128);
+        const grad = ctx.createRadialGradient(64, 64, 4, 64, 64, 62);
+        const colour = paintHazardGlow(zone.kind).replace('ALPHA', '0.32');
+        const edge = paintHazardGlow(zone.kind).replace('ALPHA', '0');
+        grad.addColorStop(0, colour);
+        grad.addColorStop(0.6, paintHazardGlow(zone.kind).replace('ALPHA', '0.12'));
+        grad.addColorStop(1, edge);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 128, 128);
+        this.textures.addCanvas(key, canvas);
+      }
+      const img = this.add.image(zone.x, zone.y, key).setDepth(1).setAlpha(0.62);
+      img.setDisplaySize(zone.r * 2, zone.r * 2);
+      this.tweens.add({ targets: img, alpha: { from: 0.36, to: 0.6 }, duration: 3200, yoyo: true, repeat: -1 });
+    }
+  }
+
+  /** Marine life that reacts to the ROV lamp and can be scanned for data. */
+  private makeCreatures(): void {
+    for (let i = 0; i < 9; i += 1) {
+      const kind = i % 3;
+      const key = `creature-${kind}`;
+      if (!this.textures.exists(key)) this.textures.addCanvas(key, paintCreature(kind, i));
+      const x = 120 + ((i * 173 + Math.round(this.theme.depthM / 5)) % (WORLD_W - 240));
+      const y = 320 + ((i * 251 + Math.round(this.theme.depthM / 9)) % (FLOOR_Y - 520));
+      const sprite = this.add.image(x, y, key).setDepth(4).setAlpha(0.9).setScale(2.1);
+      this.creatures.push({ sprite, vx: 8 + (i % 3) * 4, vy: 2, kind, scanned: false, phase: i * 1.7 });
+    }
+  }
+
   private spawnPickups(): void {
     const total = 6 + Math.round(this.theme.richness * 6);
     for (let i = 0; i < total; i += 1) {
       const x = 70 + ((i * 137 + Math.round(this.theme.depthM)) % (WORLD_W - 140));
       const y = i < 3 ? 260 + i * 180 : 420 + ((i * 211 + Math.round(this.theme.depthM / 3)) % (FLOOR_Y - 520));
-      const sprite = this.add.image(x, y, 'pickup-sample').setDepth(4).setAlpha(0.95);
+      const sprite = this.add.image(x, y, 'pickup-sample').setDepth(4).setAlpha(0.95).setScale(1.05);
       this.tweens.add({ targets: sprite, y: y - 4, duration: 1600 + i * 60, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
       this.pickups.push({ sprite, kind: 'sample', id: `sample-${this.theme.id}-${i}`, taken: false });
     }
@@ -270,7 +349,7 @@ export class DiveScene extends Phaser.Scene {
     for (let i = 0; i < clues; i += 1) {
       const x = 110 + ((i * 327 + Math.round(this.theme.depthM / 7)) % (WORLD_W - 220));
       const y = 420 + ((i * 431 + Math.round(this.theme.depthM / 11)) % (FLOOR_Y - 520));
-      const sprite = this.add.image(x, y, 'pickup-clue').setDepth(4);
+      const sprite = this.add.image(x, y, 'pickup-clue').setDepth(4).setScale(1.0);
       this.tweens.add({ targets: sprite, alpha: { from: 0.55, to: 1 }, duration: 1200, yoyo: true, repeat: -1 });
       this.pickups.push({ sprite, kind: 'clue', id: `clue-${this.theme.id}-${i}`, taken: false });
     }
@@ -352,7 +431,7 @@ export class DiveScene extends Phaser.Scene {
       tether: Math.round(tether * 100),
       lights: this.lightsOn,
       sonarReady: this.battery >= 6,
-      warning: this.currentWarning(),
+      warning: this.zoneWarning || this.currentWarning(),
       discoveries: [...this.discoveries],
     };
     window.dispatchEvent(new CustomEvent('dive:hud', { detail: hud }));
@@ -397,7 +476,7 @@ export class DiveScene extends Phaser.Scene {
     if (this.tetherStrain > 1) {
       this.hull = Math.max(0, this.hull - dt * 3);
       this.rov.setTint(0xff8a7a);
-    } else {
+    } else if (!this.zoneWarning) {
       this.rov.clearTint();
     }
 
@@ -408,6 +487,54 @@ export class DiveScene extends Phaser.Scene {
     }
     if (this.rov.x < 26 || this.rov.x > WORLD_W - 26) {
       this.hull = Math.max(0, this.hull - dt * 2.5);
+    }
+
+    // hazards: each zone has a different, named consequence
+    let warning = '';
+    for (const zone of this.zones) {
+      const d = Phaser.Math.Distance.Between(this.rov.x, this.rov.y, zone.x, zone.y);
+      if (d > zone.r) continue;
+      const intensity = 1 - d / zone.r;
+      warning = zone.label;
+      if (zone.kind === 'heat') {
+        this.hull = Math.max(0, this.hull - dt * 2.6 * intensity);
+        this.battery = Math.max(0, this.battery - dt * 0.5 * intensity);
+        this.rov.setTint(0xffb08a);
+      } else if (zone.kind === 'current') {
+        this.velocity.y += 26 * intensity * dt * 10;
+        this.velocity.x += Math.sin(this.time.now / 700 + zone.x) * 18 * intensity;
+        this.tetherStrain = Math.min(1.2, this.tetherStrain + dt * 0.05 * intensity);
+      } else if (zone.kind === 'debris') {
+        this.hull = Math.max(0, this.hull - dt * 1.8 * intensity);
+      } else {
+        this.dataPoints += dt * 1.1 * intensity;
+      }
+    }
+    this.zoneWarning = warning;
+
+    // creatures: flee the lamp, drift closer in the dark, scan on sonar
+    for (const creature of this.creatures) {
+      const d = Phaser.Math.Distance.Between(this.rov.x, this.rov.y, creature.sprite.x, creature.sprite.y);
+      const lit = this.lightsOn && d < 150;
+      if (lit) {
+        const away = Math.atan2(creature.sprite.y - this.rov.y, creature.sprite.x - this.rov.x);
+        creature.vx = Math.cos(away) * 46;
+        creature.vy = Math.sin(away) * 30;
+        creature.sprite.setScale(2.3);
+      } else {
+        creature.vx += Math.sin(this.time.now / 1600 + creature.phase) * 3 * dt;
+        creature.vy = Math.sin(this.time.now / 1100 + creature.phase) * 8;
+        creature.sprite.setScale(2.1);
+      }
+      creature.sprite.x = Phaser.Math.Clamp(creature.sprite.x + creature.vx * dt, 30, WORLD_W - 30);
+      creature.sprite.y = Phaser.Math.Clamp(creature.sprite.y + creature.vy * dt, 60, WORLD_H - 40);
+      creature.sprite.setFlipX(creature.vx < 0);
+      if (this.time.now < this.sonarUntil && d < 60 && !creature.scanned) {
+        creature.scanned = true;
+        this.dataPoints += 3;
+        this.discoveries.push(`scan-${this.theme.id}-${creature.kind}-${Math.round(creature.sprite.x)}`);
+        this.floatText(creature.sprite.x, creature.sprite.y, 'ثبت جاندار', '#c9a0ff');
+      }
     }
 
     // pickups

@@ -35,6 +35,7 @@ export function TitleHero() {
 
   return (
     <div className="title-hero" ref={hostRef} aria-hidden="true">
+      <img className="title-hero__photo" src="rooms/exterior.webp" alt="" />
       {url ? <img className="title-hero__art" src={url} alt="" /> : null}
       <div className="title-hero__shafts" />
       <div className="title-hero__snow" />
