@@ -29,9 +29,9 @@ test.describe('manual ROV dive', () => {
       { timeout: 15000 },
     );
     const before = await page.locator('.dive__stats').textContent();
-    await page.waitForTimeout(1200);
-    const after = await page.locator('.dive__stats').textContent();
-    expect(before).not.toBe(after);
+    await expect
+      .poll(async () => page.locator('.dive__stats').textContent(), { timeout: 15000 })
+      .not.toBe(before);
 
     await page.getByRole('button', { name: 'لغو' }).click();
     await expect(page.locator('.dive')).toHaveCount(0);
