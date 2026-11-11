@@ -1,4 +1,6 @@
+import { useSyncExternalStore } from 'react';
 import { nextAction } from '../nextAction';
+import { tutorial } from '../tutorial/engine';
 import { sim, useSim } from '../../state/store';
 
 /**
@@ -13,7 +15,11 @@ export function NextActionBar({
   onOpenPanel: (panel: import('../components/BottomNav').PanelId) => void;
 }) {
   useSim();
+  const tutorialState = useSyncExternalStore(tutorial.subscribe, tutorial.getSnapshot);
   const action = nextAction(sim.state);
+
+  // while the coach is teaching, one instruction at a time
+  if (!tutorialState.done && !tutorialState.paused) return null;
 
   const act = () => {
     if (action.room) onOpenRoom(action.room);
@@ -21,7 +27,7 @@ export function NextActionBar({
   };
 
   return (
-    <div className={`next-action next-action--${action.tone}`} role="status">
+    <div className={`next-action next-action--${action.tone}`} role="status" data-ui="next-action">
       <span className="next-action__dot" aria-hidden="true" />
       <div className="next-action__text">
         <strong>{action.label}</strong>

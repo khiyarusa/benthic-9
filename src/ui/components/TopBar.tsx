@@ -23,7 +23,7 @@ export function TopBar({ onOpenLog }: { onOpenLog: () => void }) {
   const alerts = state.incidents.filter((entry) => entry.minute > state.minute - 60).length;
 
   return (
-    <header className="topbar">
+    <header className="topbar" data-ui="topbar">
       <div className="topbar__clock">
         <strong>{clock.label}</strong>
         <span>{MOOD_LABEL[mood]} • {state.mode === 'campaign' ? 'کمپین' : state.mode === 'endless' ? 'بقا' : 'چالش'}</span>

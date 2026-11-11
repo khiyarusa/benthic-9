@@ -37,7 +37,7 @@ export function BottomNav({
   badge?: Partial<Record<PanelId, number>>;
 }) {
   return (
-    <nav className="navbar" aria-label="بخش‌های مدیریت ایستگاه">
+    <nav className="navbar" data-ui="nav" aria-label="بخش‌های مدیریت ایستگاه">
       {ITEMS.map((item) => {
         const count = badge?.[item.id] ?? 0;
         return (

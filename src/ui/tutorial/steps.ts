@@ -1,205 +1,183 @@
 import type { GameState, RoomId } from '../../sim/types';
 
+export interface StepCompletion {
+  /** telemetry event that proves the action, e.g. "panel:power" */
+  event?: string;
+  /** state predicate proving the action happened */
+  state?: (state: GameState) => boolean;
+  /** steps that only need acknowledgement */
+  manual?: boolean;
+}
+
 export interface TutorialStep {
   id: string;
   title: string;
   room: RoomId;
-  /** CSS selector that receives the spotlight, when the element is on screen */
+  /** CSS selector for the control that must stay visible and clickable */
   target?: string;
-  /** telemetry event that proves the player performed the action */
-  action?: string;
-  /** state predicate that proves the player performed the action */
-  done?: (state: GameState) => boolean;
-  /** if true the player advances with the «ادامه» button */
-  manual?: boolean;
+  /** fallback wording when the target cannot be found on screen */
+  fallback?: string;
   lines: string[];
-  hint?: string;
+  completion: StepCompletion;
 }
 
-export const GUIDE = {
-  name: 'آرمان کیانی',
-  role: 'مهندس ارشد ایستگاه',
-};
-
-export const TUTORIAL_TITLE = 'اولین شیفت فرمانده';
-export const TUTORIAL_SUBTITLE =
-  'به بنتیک-۹ خوش آمدی. از این لحظه، زنده ماندن این ایستگاه به تصمیم‌های تو بستگی دارد.';
-
+/**
+ * Short lines by design: the card must fit in ~14% of a phone screen. Anything
+ * longer belongs in the commander's handbook, not in the coaching card.
+ */
 export const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 'arrival',
     title: 'ورود به ایستگاه',
     room: 'command',
-    manual: true,
-    lines: [
-      'فرمانده، خوش اومدی. من آرمان کیانی‌ام، مهندس ارشد. از این به بعد کنارتم.',
-      'ارتباط با سطح قطع شده و سه سامانه وضعیت مطمئنی ندارن. اول یه نگاه به ایستگاه بندازیم.',
-    ],
-    hint: 'برای شروع، دکمهٔ «ادامه» را بزن.',
+    lines: ['فرمانده، خوش اومدی. ایستگاه وضعیت مطمئنی نداره.', 'یه نگاه به کل ایستگاه بندازیم.'],
+    completion: { manual: true },
   },
   {
     id: 'crew',
-    title: 'آشنایی با خدمه',
+    title: 'خدمه را بشناس',
     room: 'quarters',
     target: '[data-panel="crew"]',
-    action: 'panel:crew',
-    lines: [
-      'چهار نفریم: نگار زیست‌شناس، کامران زمین‌شناس، لیلا پزشک و خودم.',
-      'هر کدام یک تخصص اصلی دارن. پنل خدمه رو باز کن تا وضعیت و مهارت‌هاشون رو ببینی.',
-    ],
-    hint: 'نوار پایین → «خدمه».',
+    fallback: 'نوار پایین → «خدمه»',
+    lines: ['چهار نفریم؛ هر کدوم یک تخصص اصلی دارن.', 'پنل خدمه رو باز کن.'],
+    completion: { event: 'panel:crew' },
   },
   {
     id: 'station',
-    title: 'شناخت ایستگاه',
-    room: 'corridor',
+    title: 'وضعیت ایستگاه',
+    room: 'command',
     target: '[data-panel="overview"]',
-    action: 'panel:overview',
-    lines: [
-      'ایستگاه ده اتاق داره؛ دو عرشه که با راهروی مرکزی به هم وصلن.',
-      'پنل «ایستگاه» وضعیت کلی، هشدارها و اهداف رو نشون می‌ده.',
-    ],
-    hint: 'نوار پایین → «ایستگاه».',
+    fallback: 'نوار پایین → «ایستگاه»',
+    lines: ['این‌جا خلاصهٔ همهٔ سامانه‌ها و هشدارهاست.', 'بازش کن.'],
+    completion: { event: 'panel:overview' },
   },
   {
     id: 'room',
-    title: 'بررسی یک اتاق',
+    title: 'یک اتاق را بررسی کن',
     room: 'life',
     target: '.room-card',
-    action: 'room:open',
-    lines: [
-      'هر اتاق وضعیت خودش رو داره: سازه، آب، دما، اکسیژن و تجهیزات.',
-      'روی یکی از کارت‌های اتاق ضربه بزن. یا مستقیم روی خود اتاق در نمای ایستگاه بزن.',
-    ],
-    hint: 'کارت اتاق را لمس کن.',
+    fallback: 'پنل «ایستگاه» → روی کارت یک اتاق بزن',
+    lines: ['هر اتاق سازه، آب، دما و اکسیژن خودش رو داره.', 'یکی از کارت‌ها رو لمس کن.'],
+    completion: { event: 'room:open' },
   },
   {
     id: 'power',
-    title: 'مدیریت برق',
+    title: 'برق، خون ایستگاه',
     room: 'reactor',
     target: '[data-panel="power"]',
-    action: 'panel:power',
-    lines: [
-      'برق، خون ایستگاهه. اگه کم بیاد، پمپ‌ها و پشتیبانی حیات نیمه‌جان کار می‌کنن.',
-      'اولویت اتاق‌ها رو اینجا تعیین می‌کنیم. راکتور رو هم از همین پنل می‌شه راه‌اندازی کرد.',
-    ],
-    hint: 'نوار پایین → «برق».',
+    fallback: 'نوار پایین → «برق»',
+    lines: ['اگه برق کم بیاد، پمپ و حیات نیمه‌جان کار می‌کنن.', 'اولویت‌ها این‌جاست.'],
+    completion: { event: 'panel:power' },
   },
   {
     id: 'repair',
-    title: 'سپردن کار به خدمه',
+    title: 'کار بسپار',
     room: 'life',
-    target: '[data-panel="overview"]',
-    done: (state) =>
-      state.crew.some((member) => ['repair', 'seal', 'weld', 'pump'].includes(member.task.kind)) ||
-      state.stats.repairs > 0,
-    lines: [
-      'خدمه خودشون کار فوری رو برمی‌دارن، ولی تو می‌تونی مستقیم هم بهشون کار بسپاری.',
-      'توی پنل اتاق، تب «تعمیرات»: یک تجهیز رو به مهندس بسپار یا بدنه رو تقویت کن.',
-    ],
-    hint: 'پنل اتاق → تب تعمیرات → سپردن به مهندس.',
+    target: '[data-panel="crew"]',
+    fallback: 'پنل خدمه → وظیفهٔ دستی',
+    lines: ['خدمه خودشون کار فوری برمی‌دارن، ولی تو می‌تونی مستقیم بسپاری.', 'یک نفر رو به تعمیر بگمار.'],
+    completion: {
+      state: (state) =>
+        state.crew.some((member) => ['repair', 'seal', 'weld', 'pump'].includes(member.task.kind)) ||
+        state.stats.repairs > 0,
+    },
   },
   {
     id: 'life',
     title: 'پشتیبانی حیات',
     room: 'life',
     target: '[data-panel="life"]',
-    action: 'panel:life',
-    lines: [
-      'اکسیژن از آب و برق ساخته می‌شه. اگه الکترولیز بخوابه، ذخیره فقط چند ساعت کافیه.',
-      'این پنل غلظت اکسیژن و CO₂ هر اتاق رو نشون می‌ده.',
-    ],
-    hint: 'نوار پایین → «حیات».',
+    fallback: 'نوار پایین → «حیات»',
+    lines: ['اکسیژن از آب و برق ساخته می‌شه؛ ذخیره چند ساعت بیشتر نیست.', 'غلظت اکسیژن هر اتاق این‌جاست.'],
+    completion: { event: 'panel:life' },
   },
   {
     id: 'research',
-    title: 'پژوهش',
+    title: 'پژوهش را شروع کن',
     room: 'geolab',
     target: '[data-panel="research"]',
-    done: (state) => state.research.activeNodeId !== null || state.research.completed.length > 0,
-    lines: [
-      'بدون پژوهش، ایستگاه فقط دوام می‌آره؛ بهتر نمی‌شه.',
-      'با دادهٔ پژوهشی یک گره رو شروع کن. آلیاژ فشار بالا فرسایش بدنه رو کم می‌کنه.',
-    ],
-    hint: 'نوار پایین → «پژوهش» → شروع پژوهش.',
+    fallback: 'نوار پایین → «پژوهش»',
+    lines: ['بدون فناوری، ایستگاه فقط دوام می‌آره.', 'یک گره انتخاب کن.'],
+    completion: {
+      state: (state) => state.research.activeNodeId !== null || state.research.completed.length > 0,
+    },
   },
   {
     id: 'storage',
     title: 'انبار و ساخت',
     room: 'storage',
     target: '[data-panel="storage"]',
-    action: 'panel:storage',
-    lines: [
-      'قطعات یدکی تموم‌شدنی‌اند. کارگاه ساخت می‌تونه از قراضه، قطعهٔ تازه بسازه.',
-      'هر تعمیر قطعه مصرف می‌کنه؛ موجودی رو زیر نظر داشته باش.',
-    ],
-    hint: 'نوار پایین → «انبار».',
+    fallback: 'نوار پایین → «انبار»',
+    lines: ['قطعات یدکی تموم‌شدنی‌ان.', 'موجودی و ساخت رو ببین.'],
+    completion: { event: 'panel:storage' },
   },
   {
     id: 'expedition',
     title: 'اولین سفر ROV',
     room: 'rov',
     target: '[data-panel="rov"]',
-    done: (state) => state.rov.deployed || state.stats.expeditions > 0,
-    lines: [
-      'بیرون ایستگاه، دنیایی هست که باید بشناسیمش. ROV تنها چشم ما در اونه.',
-      'یک عمق انتخاب کن و رها کن. مراقب باتری باش؛ برگشت هم بخشی از مأموریته.',
-    ],
-    hint: 'نوار پایین → «اکتشاف» → انتخاب عمق.',
+    fallback: 'نوار پایین → «اکتشاف»',
+    lines: ['ROV تنها چشم ما بیرونه.', 'یک عمق انتخاب کن و بفرست.'],
+    completion: {
+      state: (state) => state.rov.deployed || state.stats.expeditions > 0,
+    },
   },
   {
     id: 'reports',
     title: 'گزارش‌ها',
     room: 'command',
     target: '[data-panel="log"]',
-    action: 'panel:log',
-    lines: [
-      'هر اتفاقی که می‌افته اینجا ثبت می‌شه؛ از ترک بدنه تا تعمیر موفق.',
-      'وقتی گم شدی، گزارش‌ها و «راهنمای فرمانده» بهترین مرجع‌اند.',
-    ],
-    hint: 'نوار پایین → «گزارش».',
+    fallback: 'نوار پایین → «گزارش»',
+    lines: ['هر اتفاقی این‌جا ثبت می‌شه.', 'وقتی گم شدی، اول همین رو باز کن.'],
+    completion: { event: 'panel:log' },
   },
   {
     id: 'first-shift',
     title: 'پایان شیفت اول',
     room: 'corridor',
-    manual: true,
-    done: (state) => state.minute >= 20,
-    lines: [
-      'بیست دقیقه دوام آوردی. ایستگاه هنوز سرپاست و خدمه بهت اعتماد دارن.',
-      'از این به بعد خودت تصمیم می‌گیری. اگه نیاز شد، «راهنمای فرمانده» همیشه در دسترسه.',
-    ],
-    hint: 'وقتی آماده بودی، «پایان آموزش» را بزن.',
+    lines: ['ایستگاه هنوز سرپاست و خدمه بهت اعتماد دارن.', 'از این به بعد خودت تصمیم می‌گیری.'],
+    completion: { manual: true },
   },
 ];
 
-const STORAGE_KEY = 'benthic9.tutorial.v2';
+export const GUIDE = {
+  name: 'آرمان کیانی',
+  role: 'مهندس ارشد',
+};
+
+export const TUTORIAL_TITLE = 'اولین شیفت فرمانده';
+
+const STORAGE_KEY = 'benthic9.tutorial.v3';
 
 export interface TutorialProgress {
   index: number;
   done: boolean;
   paused: boolean;
+  minimized: boolean;
 }
 
-export function loadTutorialProgress(): TutorialProgress {
+export const EMPTY_PROGRESS: TutorialProgress = { index: 0, done: false, paused: false, minimized: false };
+
+export function loadProgress(): TutorialProgress {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { index: 0, done: false, paused: false };
-    const parsed = JSON.parse(raw) as TutorialProgress;
+    if (!raw) return { ...EMPTY_PROGRESS };
+    const parsed = JSON.parse(raw) as Partial<TutorialProgress>;
     return {
-      index: Number.isFinite(parsed.index) ? Math.max(0, Math.min(TUTORIAL_STEPS.length, parsed.index)) : 0,
+      index: Math.max(0, Math.min(TUTORIAL_STEPS.length, Number(parsed.index) || 0)),
       done: Boolean(parsed.done),
       paused: Boolean(parsed.paused),
+      minimized: Boolean(parsed.minimized),
     };
   } catch {
-    return { index: 0, done: false, paused: false };
+    return { ...EMPTY_PROGRESS };
   }
 }
 
-export function saveTutorialProgress(progress: TutorialProgress): void {
+export function saveProgress(progress: TutorialProgress): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
   } catch {
-    /* storage can be unavailable in private browsing */
+    /* private browsing */
   }
 }

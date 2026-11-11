@@ -88,3 +88,51 @@ export function paintCrewSheet(look: CrewLook): HTMLCanvasElement {
 
   return canvas;
 }
+
+/**
+ * Pixel-art bust of the tutorial guide, generated from the same palette as the
+ * in-world sprites so the portrait and the character match.
+ */
+export function paintPortrait(pixels = 48): HTMLCanvasElement {
+  const { canvas, ctx } = surface(pixels, pixels);
+  const b = new Brush(ctx);
+  const s = pixels / 24;
+
+  const rect = (x: number, y: number, w: number, h: number, color: string, alpha = 1) =>
+    b.rect(Math.round(x * s), Math.round(y * s), Math.max(1, Math.round(w * s)), Math.max(1, Math.round(h * s)), color, alpha);
+
+  // backdrop
+  rect(0, 0, 24, 24, '#061a22');
+  rect(1, 1, 22, 22, '#0a2a35');
+  // shoulders
+  rect(2, 18, 20, 6, '#123c4a');
+  rect(5, 17, 14, 2, '#16505f');
+  rect(3, 19, 3, 4, '#2f7f86');
+  // neck
+  rect(10, 15, 4, 4, '#b9835f');
+  // helmet shell
+  rect(6, 4, 12, 11, '#c9dbe1');
+  rect(6, 4, 12, 2, '#e8f4f7');
+  rect(6, 13, 12, 2, '#9fb6bf');
+  rect(4, 8, 2, 6, '#9fb6bf');
+  rect(18, 8, 2, 6, '#9fb6bf');
+  // visor frame
+  rect(7, 7, 10, 7, '#0a3542');
+  rect(7, 7, 10, 1, '#16505f');
+  // face
+  rect(8, 9, 8, 6, '#b9835f');
+  rect(9, 10, 2, 1, '#2a1a12');
+  rect(14, 10, 2, 1, '#2a1a12');
+  rect(11, 12, 3, 1, '#a06a4a');
+  // beard
+  rect(8, 13, 8, 2, '#241812');
+  rect(9, 15, 6, 1, '#241812');
+  // helmet lamp + rim light
+  rect(16, 5, 2, 2, '#ffd9a0');
+  rect(6, 5, 1, 9, '#4fe0e6', 0.25);
+  rect(18, 6, 1, 8, '#2a6577', 0.4);
+  // suit badge
+  rect(15, 18, 3, 2, '#4fe0e6', 0.5);
+
+  return canvas;
+}

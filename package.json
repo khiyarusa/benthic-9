@@ -1,7 +1,7 @@
 {
   "name": "benthic-9",
   "private": true,
-  "version": "0.3.0-alpha.1",
+  "version": "0.4.0-alpha.1",
   "description": "BENTHIC-9 | Deep station survival simulation",
   "type": "module",
   "scripts": {

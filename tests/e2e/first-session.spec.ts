@@ -11,7 +11,7 @@ test.describe('BENTHIC-9 first session', () => {
     // portrait gate must stay hidden in landscape
     await expect(page.locator('.orientation-gate')).toBeHidden();
 
-    await page.getByRole('button', { name: 'کمپین جدید' }).click();
+    await page.getByRole('button', { name: 'شروع کمپین' }).click();
     await expect(page.locator('.topbar')).toBeVisible();
 
     const briefing = page.locator('.modal-card');
@@ -49,7 +49,7 @@ test.describe('BENTHIC-9 first session', () => {
 
   test('research panel exposes the real technology tree', async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('button', { name: 'کمپین جدید' }).click();
+    await page.getByRole('button', { name: 'شروع کمپین' }).click();
     const start = page.getByRole('button', { name: 'شروع مأموریت' });
     if (await start.isVisible().catch(() => false)) await start.click();
 

@@ -1,5 +1,5 @@
 import { restartTutorial, resumeTutorial } from '../tutorial/TutorialOverlay';
-import { loadTutorialProgress } from '../tutorial/steps';
+import { loadProgress } from '../tutorial/steps';
 import { Section } from '../components/ui';
 
 const TOPICS = [
@@ -106,7 +106,7 @@ const TOPICS = [
 ];
 
 export function HelpPanel() {
-  const progress = loadTutorialProgress();
+  const progress = loadProgress();
   const status = progress.done ? 'تکمیل‌شده' : progress.paused ? 'متوقف‌شده' : 'در جریان';
 
   return (

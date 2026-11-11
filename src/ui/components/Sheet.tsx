@@ -14,7 +14,7 @@ export function Sheet({
   return (
     <>
       <div className="sheet-backdrop" onClick={onClose} />
-      <section className="sheet" role="dialog" aria-modal="true" aria-label={title}>
+      <section className="sheet" data-ui="sheet" role="dialog" aria-modal="true" aria-label={title}>
         <div className="sheet__handle" />
         <header className="sheet__head">
           <div className="sheet__title">{title}</div>
