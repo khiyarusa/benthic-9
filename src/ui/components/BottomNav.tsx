@@ -6,6 +6,8 @@ export type PanelId =
   | 'storage'
   | 'research'
   | 'rov'
+  | 'missions'
+  | 'codex'
   | 'log'
   | 'help';
 
@@ -23,22 +25,30 @@ const ITEMS: NavItem[] = [
   { id: 'storage', glyph: '▤', label: 'انبار' },
   { id: 'research', glyph: '⌬', label: 'پژوهش' },
   { id: 'rov', glyph: '◈', label: 'اکتشاف' },
+  { id: 'missions', glyph: '◎', label: 'مأموریت' },
+  { id: 'codex', glyph: '❖', label: 'کدکس' },
   { id: 'log', glyph: '✎', label: 'گزارش' },
   { id: 'help', glyph: '؟', label: 'راهنما' },
 ];
+
+/** Panels that only appear in advanced mode. */
+const TECHNICAL: PanelId[] = ['power', 'life', 'storage', 'research'];
 
 export function BottomNav({
   active,
   onSelect,
   badge,
+  advanced = false,
 }: {
   active: PanelId | null;
   onSelect: (id: PanelId) => void;
   badge?: Partial<Record<PanelId, number>>;
+  advanced?: boolean;
 }) {
+  const items = advanced ? ITEMS : ITEMS.filter((item) => !TECHNICAL.includes(item.id));
   return (
     <nav className="navbar" data-ui="nav" aria-label="بخش‌های مدیریت ایستگاه">
-      {ITEMS.map((item) => {
+      {items.map((item) => {
         const count = badge?.[item.id] ?? 0;
         return (
           <button

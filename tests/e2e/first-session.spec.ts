@@ -4,6 +4,8 @@ test.describe('BENTHIC-9 first session', () => {
   test.skip(({ viewport }) => (viewport?.width ?? 0) < 900, 'landscape only');
 
   test('boots, starts a campaign and opens the station panels', async ({ page }) => {
+    // technical panels live behind the advanced toggle since V6
+    await page.addInitScript(() => localStorage.setItem('benthic9.advanced', 'on'));
     await page.goto('/');
     await expect(page.locator('.brand-title')).toHaveText('BENTHIC-9');
     await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
@@ -48,6 +50,7 @@ test.describe('BENTHIC-9 first session', () => {
   });
 
   test('research panel exposes the real technology tree', async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('benthic9.advanced', 'on'));
     await page.goto('/');
     await page.getByRole('button', { name: 'شروع کمپین' }).click();
     const start = page.getByRole('button', { name: 'شروع مأموریت' });

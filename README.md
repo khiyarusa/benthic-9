@@ -9,6 +9,14 @@
 |---|---|
 | ![شیرجه](docs/screenshots/v5-dive.png) | ![آموزش](docs/screenshots/v4-coach-2.png) |
 
+## تازه در V6
+
+- بافت‌های فتوگرامتری واقعی (CC0) در زمین شیرجه و رابط فلزی
+- صدا و موسیقی ضبط‌شده، میکسر چهارباسه، موسیقی تطبیقی
+- روایت فارسی فرمانده و دکتر کاویانی با زیرنویس
+- کمپین سه‌پرده‌ای با ۱۲ مأموریت و کدکس ۱۰ یادداشتی
+- نوار هدف بعدی و حالت ساده/پیشرفته
+
 ## تازه در V5
 
 - شیرجهٔ واقعی ROV: پنج زیستگاه، کنترل لمسی، چراغ، سونار، کابل و باتری
@@ -61,7 +69,7 @@ APK در `android/app/build/outputs/apk/debug/app-debug.apk` ساخته می‌�
 
 ## دریافت بازی
 
-- **ریلیز v0.5.0-alpha.1 (APK دیباگ):** https://github.com/khiyarusa/benthic-9/releases/tag/v0.5.0-alpha.1
+- **ریلیز v0.6.0 (APK دیباگ):** https://github.com/khiyarusa/benthic-9/releases/tag/v0.6.0
 - مخزن خصوصی است؛ برای دانلود باید با حساب `khiyarusa` وارد شوی.
 - SHA-256 فایل APK: `BEAA08F1AE264A9C49EB1D9FEB9E0A697BE9586F71E5FA84F6F2F4B6210206CB`
 

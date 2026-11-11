@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { paintDarkness, paintRov, paintSeabed, DIVE_THEMES, type DiveTheme } from './scenery';
+import { paintCaustics, paintDarkness, paintRov, paintSeabed, makeTexSet, DIVE_THEMES, type DiveTheme } from './scenery';
 import { surface } from '../art/painter';
 
 export interface DiveResult {
@@ -46,6 +46,7 @@ export class DiveScene extends Phaser.Scene {
   private theme!: DiveTheme;
   private rov!: Phaser.GameObjects.Image;
   private dark!: Phaser.GameObjects.Image;
+  private caustics!: Phaser.GameObjects.TileSprite;
   private pickups: Pickup[] = [];
   private target = new Phaser.Math.Vector2(0, 0);
   private velocity = new Phaser.Math.Vector2(0, 0);
@@ -83,6 +84,15 @@ export class DiveScene extends Phaser.Scene {
     this.startedAt = 0;
   }
 
+  preload(): void {
+    this.load.image('tex-seabed', 'tex/seabed-a.jpg');
+    this.load.image('tex-cliff', 'tex/rock-cliff.jpg');
+    this.load.image('tex-boulder', 'tex/rock-boulder.jpg');
+    this.load.image('tex-plates', 'tex/hull-plates.jpg');
+    this.load.image('tex-rust', 'tex/rust-steel.jpg');
+    this.load.image('tex-walkway', 'tex/walkway.jpg');
+  }
+
   create(): void {
     this.makeTextures();
 
@@ -103,6 +113,11 @@ export class DiveScene extends Phaser.Scene {
       ease: 'Sine.easeInOut',
     });
 
+    this.caustics = this.add
+      .tileSprite(0, 0, WORLD_W, WORLD_H, 'caustics')
+      .setOrigin(0, 0)
+      .setDepth(2)
+      .setAlpha(0.22);
     this.dark = this.add.image(0, 0, 'darkness').setScrollFactor(0).setDepth(8).setScale(2.4);
 
     const cam = this.cameras.main;
@@ -120,6 +135,8 @@ export class DiveScene extends Phaser.Scene {
       if (event.key === 'ArrowLeft' || event.key === 'a') this.target.x -= step;
       if (event.key === 'ArrowRight' || event.key === 'd') this.target.x += step;
     });
+
+    this.makeLife();
 
     this.startedAt = this.time.now;
     this.hudTimer = this.time.addEvent({ delay: 120, loop: true, callback: () => this.emitHud() });
@@ -155,7 +172,22 @@ export class DiveScene extends Phaser.Scene {
       this.textures.addCanvas('darkness', paintDarkness(512));
     }
     if (!this.textures.exists('seabed')) {
-      this.textures.addCanvas('seabed', paintSeabed(this.theme, WORLD_W, WORLD_H));
+      const img = (key: string) => {
+        const src = this.textures.get(key).getSourceImage();
+        return src instanceof HTMLImageElement ? src : undefined;
+      };
+      const tex = makeTexSet({
+        seabed: img('tex-seabed'),
+        cliff: img('tex-cliff'),
+        boulder: img('tex-boulder'),
+        plates: img('tex-plates'),
+        rust: img('tex-rust'),
+        walkway: img('tex-walkway'),
+      });
+      this.textures.addCanvas('seabed', paintSeabed(this.theme, WORLD_W, WORLD_H, tex));
+    }
+    if (!this.textures.exists('caustics')) {
+      this.textures.addCanvas('caustics', paintCaustics(256));
     }
     if (!this.textures.exists('pickup-sample')) {
       const { canvas, ctx } = surface(10, 10);
@@ -183,6 +215,45 @@ export class DiveScene extends Phaser.Scene {
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, 220, 220);
       this.textures.addCanvas('sonar', canvas);
+    }
+  }
+
+  /** Plankton motes and slow jellyfish: cheap, but the water stops feeling empty. */
+  private makeLife(): void {
+    if (!this.textures.exists('mote')) {
+      const { canvas, ctx } = surface(8, 8);
+      const g = ctx.createRadialGradient(4, 4, 0, 4, 4, 4);
+      g.addColorStop(0, 'rgba(200, 240, 250, 0.9)');
+      g.addColorStop(1, 'rgba(200, 240, 250, 0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, 8, 8);
+      this.textures.addCanvas('mote', canvas);
+    }
+    this.add.particles(0, 0, 'mote', {
+      x: { min: 20, max: WORLD_W - 20 },
+      y: { min: 0, max: FLOOR_Y },
+      lifespan: 14000,
+      speedY: { min: -9, max: -3 },
+      speedX: { min: -6, max: 6 },
+      scale: { start: 0.9, end: 0.2 },
+      alpha: { start: 0.55, end: 0 },
+      quantity: 1,
+      frequency: 320,
+      blendMode: 'ADD',
+    }).setDepth(3);
+
+    for (let i = 0; i < 4; i += 1) {
+      const gfx = this.add.circle(0, 0, 7, 0x9fe6f2, 0.14).setDepth(3);
+      gfx.setPosition(120 + i * 190, 260 + i * 210);
+      this.tweens.add({
+        targets: gfx,
+        y: `+= ${90 + i * 30}`,
+        duration: 9000 + i * 1800,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+      this.tweens.add({ targets: gfx, alpha: { from: 0.08, to: 0.2 }, duration: 2400, yoyo: true, repeat: -1 });
     }
   }
 
@@ -358,6 +429,9 @@ export class DiveScene extends Phaser.Scene {
         this.floatText(pickup.sprite.x, pickup.sprite.y, 'کشف جدید', '#4fe0e6');
       }
     }
+
+    this.caustics.tilePositionX += dt * 6;
+    this.caustics.tilePositionY -= dt * 3;
 
     // darkness follows the ROV on screen
     const cam = this.cameras.main;

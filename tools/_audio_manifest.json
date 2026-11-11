@@ -1,0 +1,83 @@
+[
+ {
+  "name": "sfx-klaxon",
+  "file": "audio/sfx-klaxon.ogg",
+  "license": "Public domain",
+  "author": "US Navy (via Wikimedia Commons)",
+  "source": "https://commons.wikimedia.org/wiki/File:WWII_submarine_dive_klaxon.ogg",
+  "kind": "sfx",
+  "seconds": 3.8
+ },
+ {
+  "name": "sfx-sonar",
+  "file": "audio/sfx-sonar.ogg",
+  "license": "CC BY-SA 3.0",
+  "author": "Wikimedia Commons contributor",
+  "source": "https://commons.wikimedia.org/wiki/File:Sonar_pings.ogg",
+  "kind": "sfx",
+  "seconds": 3.7
+ },
+ {
+  "name": "sfx-static",
+  "file": "audio/sfx-static.ogg",
+  "license": "CC0 1.0",
+  "author": "Wikimedia Commons contributor",
+  "source": "https://commons.wikimedia.org/wiki/File:Static_B.wav",
+  "kind": "sfx",
+  "seconds": 2.5
+ },
+ {
+  "name": "sfx-water",
+  "file": "audio/sfx-water.ogg",
+  "license": "CC BY-SA 3.0",
+  "author": "Wikimedia Commons contributor",
+  "source": "https://commons.wikimedia.org/wiki/File:Suikinkutsu_recording.ogg",
+  "kind": "sfx",
+  "seconds": 8.0
+ },
+ {
+  "name": "music-menu",
+  "file": "audio/music-menu.ogg",
+  "license": "CC0 1.0",
+  "author": "John Bartmann",
+  "source": "https://commons.wikimedia.org/wiki/File:John_Bartmann_-_blue-whale-master.ogg",
+  "kind": "music",
+  "seconds": 57.0
+ },
+ {
+  "name": "music-calm",
+  "file": "audio/music-calm.ogg",
+  "license": "CC BY 4.0",
+  "author": "Kai Engel",
+  "source": "https://commons.wikimedia.org/wiki/File:Kai_Engel_-_08_-_Oecumene_Sleeps.ogg",
+  "kind": "music",
+  "seconds": 57.0
+ },
+ {
+  "name": "music-tension",
+  "file": "audio/music-tension.ogg",
+  "license": "CC BY 4.0",
+  "author": "Kai Engel",
+  "source": "https://commons.wikimedia.org/wiki/File:Kai_Engel_-_04_-_Imminence.ogg",
+  "kind": "music",
+  "seconds": 57.0
+ },
+ {
+  "name": "music-signal",
+  "file": "audio/music-signal.ogg",
+  "license": "CC0 1.0",
+  "author": "John Bartmann",
+  "source": "https://commons.wikimedia.org/wiki/File:John_Bartmann_-_enigmatic-needle-master.ogg",
+  "kind": "music",
+  "seconds": 57.0
+ },
+ {
+  "name": "amb-vent",
+  "file": "audio/amb-vent.ogg",
+  "license": "CC BY 2.5",
+  "author": "",
+  "source": "https://commons.wikimedia.org/wiki/File:Black_smoker_hydrothermal_vent.ogg",
+  "kind": "loop",
+  "seconds": 10.8
+ }
+]

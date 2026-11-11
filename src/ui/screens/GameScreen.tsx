@@ -17,11 +17,14 @@ import { LogisticsPanel } from '../panels/LogisticsPanel';
 import { ResearchPanel } from '../panels/ResearchPanel';
 import { ExplorationPanel } from '../panels/ExplorationPanel';
 import { ReportsPanel } from '../panels/ReportsPanel';
-import { SettingsPanel } from '../panels/SettingsPanel';
+import { SettingsPanel, readAdvanced } from '../panels/SettingsPanel';
 import { HelpPanel } from '../panels/HelpPanel';
 import { TutorialOverlay } from '../tutorial/TutorialOverlay';
 import { NextActionBar } from '../components/NextActionBar';
 import { DiveLauncher } from '../panels/DiveLauncher';
+import { MissionBoard } from '../panels/MissionBoard';
+import { PrimaryObjective } from '../components/PrimaryObjective';
+import { CodexPanel } from '../panels/CodexPanel';
 
 const PANEL_TITLES: Record<PanelId, string> = {
   overview: 'نمای ایستگاه',
@@ -31,6 +34,8 @@ const PANEL_TITLES: Record<PanelId, string> = {
   storage: 'انبار و تولید',
   research: 'پژوهش و فناوری',
   rov: 'اکتشاف با ROV',
+  missions: 'تختهٔ مأموریت',
+  codex: 'کدکس اعماق',
   log: 'گزارش‌ها و تنظیمات',
   help: 'راهنمای فرمانده',
 };
@@ -48,6 +53,7 @@ export function GameScreen({ onQuit, onRestart }: { onQuit: () => void; onRestar
   const [room, setRoom] = useState<RoomId | null>(null);
   const [logTab, setLogTab] = useState<'reports' | 'settings'>('reports');
   const [victoryDismissed, setVictoryDismissed] = useState(false);
+  const [advanced, setAdvanced] = useState(readAdvanced);
 
   const alerts = stationAlerts(state);
   const criticalCount = alerts.filter((alert) => alert.level === 'critical').length;
@@ -58,7 +64,15 @@ export function GameScreen({ onQuit, onRestart }: { onQuit: () => void; onRestar
       setRoom(null);
     };
     window.addEventListener('benthic:close-overlays', closeAll);
-    return () => window.removeEventListener('benthic:close-overlays', closeAll);
+    const onAdvanced = (event: Event) => {
+      setAdvanced(Boolean((event as CustomEvent<boolean>).detail));
+      setPanel(null);
+    };
+    window.addEventListener('benthic:advanced', onAdvanced);
+    return () => {
+      window.removeEventListener('benthic:close-overlays', closeAll);
+      window.removeEventListener('benthic:advanced', onAdvanced);
+    };
   }, []);
 
   const openPanel = (id: PanelId) => {
@@ -90,6 +104,10 @@ export function GameScreen({ onQuit, onRestart }: { onQuit: () => void; onRestar
         return <ResearchPanel />;
       case 'rov':
         return <ExplorationPanel />;
+      case 'missions':
+        return <MissionBoard />;
+      case 'codex':
+        return <CodexPanel />;
       case 'help':
         return <HelpPanel />;
       case 'log':
@@ -114,6 +132,7 @@ export function GameScreen({ onQuit, onRestart }: { onQuit: () => void; onRestar
   return (
     <>
       <TopBar onOpenLog={() => openPanel('log')} />
+      <PrimaryObjective onOpen={() => openPanel('missions')} />
 
       <div className="stage-area">
         <GameCanvas onSelectRoom={openRoom} />
@@ -123,6 +142,7 @@ export function GameScreen({ onQuit, onRestart }: { onQuit: () => void; onRestar
       </div>
 
       <BottomNav
+        advanced={advanced}
         active={room ? null : panel}
         onSelect={openPanel}
         badge={{

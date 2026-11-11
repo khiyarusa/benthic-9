@@ -1,0 +1,337 @@
+/* ---------- V6: narrator, mission board, codex ---------- */
+
+.narrator {
+  position: fixed;
+  z-index: 44;
+  inset-inline: 12px;
+  top: calc(var(--safe-top) + 68px);
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  max-width: 560px;
+  margin-inline: auto;
+  padding: 9px 12px;
+  border-inline-start: 2px solid var(--cyan-dim);
+  border-radius: 4px;
+  background: linear-gradient(90deg, rgba(4, 18, 24, 0.94), rgba(4, 18, 24, 0.72));
+  backdrop-filter: blur(6px);
+  animation: narrator-in 260ms ease-out;
+}
+
+.narrator--warn { border-inline-start-color: var(--amber); }
+.narrator--critical { border-inline-start-color: #ff6a5a; }
+
+@keyframes narrator-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.narrator__who {
+  flex: 0 0 auto;
+  font-size: 10.5px;
+  color: var(--cyan);
+  white-space: nowrap;
+  padding-top: 1px;
+}
+
+.narrator__text {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: #dff2f7;
+}
+
+/* primary objective strip */
+.primary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 10px;
+  border: none;
+  border-top: 1px solid rgba(79, 224, 230, 0.12);
+  background: linear-gradient(90deg, rgba(6, 26, 34, 0.9), rgba(6, 26, 34, 0.55));
+  color: var(--text);
+  font-family: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.primary__label {
+  flex: 1;
+  font-size: 11.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.primary__bar {
+  width: 64px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.primary__bar span {
+  display: block;
+  height: 100%;
+  background: var(--cyan);
+}
+
+.primary__pct {
+  font-size: 10px;
+  color: var(--muted);
+  min-width: 28px;
+  text-align: end;
+}
+
+/* mission board */
+.board__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.board__head h2,
+.codex__head h2 {
+  margin: 0 0 2px;
+  font-size: 15px;
+}
+
+.board-act {
+  margin-bottom: 12px;
+  padding: 10px;
+  border: 1px solid var(--line-soft);
+  border-radius: 5px;
+  background: rgba(6, 22, 30, 0.55);
+}
+
+.board-act.is-locked {
+  opacity: 0.55;
+}
+
+.board-act__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.board-act__head h3 {
+  margin: 0;
+  font-size: 13px;
+  color: var(--cyan);
+}
+
+.board-act__goal {
+  margin: 6px 0 8px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.board-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.board-item {
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  background: rgba(2, 12, 18, 0.5);
+}
+
+.board-item.is-done {
+  border-color: rgba(111, 227, 166, 0.35);
+}
+
+.board-item__bar {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.board-item__mark {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--line-soft);
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.board-item.is-done .board-item__mark {
+  border-color: rgba(111, 227, 166, 0.6);
+  color: #6fe3a6;
+}
+
+.board-item h4 {
+  margin: 0 0 2px;
+  font-size: 12.5px;
+}
+
+.board-item p {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.board-steps {
+  margin: 5px 0 0;
+  padding-inline-start: 14px;
+  font-size: 10.5px;
+  color: rgba(190, 226, 236, 0.7);
+}
+
+.board-item__reward {
+  margin-top: 5px !important;
+  font-size: 10.5px !important;
+  color: var(--cyan) !important;
+  opacity: 0.8;
+}
+
+/* codex */
+.codex__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.codex__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px;
+}
+
+.codex-card {
+  position: relative;
+  padding: 10px;
+  border: 1px solid rgba(79, 224, 230, 0.18);
+  border-radius: 4px;
+  background: linear-gradient(160deg, rgba(8, 30, 40, 0.82), rgba(3, 14, 20, 0.72));
+}
+
+.codex-card h3 {
+  margin: 0 0 5px;
+  font-size: 12.5px;
+  color: #eafcff;
+}
+
+.codex-card p {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.7;
+  color: rgba(206, 234, 240, 0.86);
+}
+
+.codex-card__tag {
+  position: absolute;
+  inset-block-start: 8px;
+  inset-inline-end: 8px;
+  font-size: 9px;
+  color: var(--cyan);
+  opacity: 0.7;
+}
+
+.codex-card--locked {
+  border-style: dashed;
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(4, 12, 16, 0.5);
+}
+
+.codex-card--locked h3 {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.codex-card--locked p {
+  color: rgba(190, 210, 220, 0.45);
+}
+
+/* audio mix sliders */
+.mix-row {
+  display: grid;
+  grid-template-columns: 74px 1fr 38px;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 11.5px;
+}
+
+.mix-row input[type='range'] {
+  width: 100%;
+  accent-color: var(--cyan);
+}
+
+.mix-row span:last-child {
+  text-align: end;
+  color: var(--muted);
+  font-size: 10.5px;
+}
+
+/* V6: real material layers behind the painted menu hero */
+.title-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('/tex/rock-cliff.jpg'), url('/tex/seabed-a.jpg');
+  background-size: 420px, 380px;
+  background-position: 0 0, 120px 60px;
+  background-blend-mode: multiply, screen;
+  opacity: 0.22;
+  mix-blend-mode: luminosity;
+  filter: blur(1px) brightness(0.5) contrast(1.25);
+  pointer-events: none;
+}
+
+.title-screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(70% 55% at 50% 22%, rgba(0, 0, 0, 0) 0%, rgba(1, 8, 12, 0.55) 70%, rgba(1, 6, 10, 0.92) 100%),
+    linear-gradient(180deg, rgba(2, 10, 15, 0.2) 0%, rgba(2, 9, 14, 0.72) 100%);
+  pointer-events: none;
+}
+
+.title-screen__body,
+.title-actions,
+.title-screen .brand-mark {
+  position: relative;
+  z-index: 2;
+}
+
+/* V6: subtle real material on panels, so metal reads as metal */
+.sheet::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url('/tex/walkway.jpg');
+  background-size: 340px;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+}
+
+.sheet > * {
+  position: relative;
+}
+
+.navbar {
+  background-image: url('/tex/brushed-metal.jpg');
+  background-size: 260px;
+  background-blend-mode: soft-light;
+}

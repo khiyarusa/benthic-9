@@ -65,7 +65,13 @@ export function Toggle({
 }) {
   return (
     <div className="toggle-row" style={disabled ? { opacity: 0.5 } : undefined}>
-      <div>
+      <div
+        role="presentation"
+        style={{ cursor: disabled ? 'default' : 'pointer' }}
+        onClick={() => {
+          if (!disabled) onChange(!checked);
+        }}
+      >
         {label}
         {hint ? <small>{hint}</small> : null}
       </div>

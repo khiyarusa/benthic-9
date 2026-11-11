@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { isAudioEnabled, playAlarm, playClick, setAmbientIntensity, startAmbient } from '../audio/sfx';
+import { isAudioEnabled, playClick } from '../audio/sfx';
+import { isMixEnabled, setMixEnabled, unlockAudio } from '../audio/mixer';
+import { applyScene, narrate, tickAudio } from '../audio/director';
+import { Narrator } from './components/Narrator';
 import { saveGame, savedAt } from '../sim/save';
-import { stationAlerts } from '../sim/derived';
 import type { GameMode } from '../sim/types';
 import { continueGame, sim, startNewGame } from '../state/store';
 import { GameScreen } from './screens/GameScreen';
@@ -45,24 +47,34 @@ export default function App() {
     return () => window.clearInterval(timer);
   }, []);
 
+  // The audio graph can only start after a real gesture, so unlock on the
+  // first pointer event and never again.
   useEffect(() => {
     const startAudio = () => {
-      if (isAudioEnabled()) startAmbient();
+      unlockAudio();
+      setMixEnabled(isAudioEnabled());
       document.removeEventListener('pointerdown', startAudio);
     };
     document.addEventListener('pointerdown', startAudio);
-
-    const intensity = window.setInterval(() => {
-      const alerts = stationAlerts(sim.state);
-      const critical = alerts.filter((alert) => alert.level === 'critical').length;
-      setAmbientIntensity(Math.min(1, critical * 0.35 + (alerts.length > 0 ? 0.15 : 0)));
-    }, 2500);
-
-    return () => {
-      document.removeEventListener('pointerdown', startAudio);
-      window.clearInterval(intensity);
-    };
+    return () => document.removeEventListener('pointerdown', startAudio);
   }, []);
+
+  // Adaptive bed: menu, calm station, tension, emergency and dive each have
+  // their own music; the director swaps them with a crossfade.
+  useEffect(() => {
+    if (!isMixEnabled()) return;
+    applyScene(screen === 'title' ? 'menu' : 'calm');
+    const timer = window.setInterval(() => {
+      if (screen === 'game') tickAudio(sim.state);
+    }, 2000);
+    return () => window.clearInterval(timer);
+  }, [screen]);
+
+  useEffect(() => {
+    if (screen !== 'title' || !isMixEnabled()) return;
+    const intro = window.setTimeout(() => applyScene('menu'), 400);
+    return () => window.clearTimeout(intro);
+  }, [screen]);
 
   useEffect(() => {
     const onClick = (event: PointerEvent) => {
@@ -84,7 +96,7 @@ export default function App() {
       const key = `${latest.minute}-${latest.text}`;
       if (key !== lastIncidentRef.current) {
         lastIncidentRef.current = key;
-        if (latest.severity === 'critical') playAlarm();
+        if (latest.severity === 'critical') void narrate('emergency');
       }
     }, 1200);
     return () => window.clearInterval(timer);
@@ -93,6 +105,7 @@ export default function App() {
   const handleStart = (mode: GameMode) => {
     startNewGame(mode);
     setScreen('game');
+    if (mode === 'campaign') window.setTimeout(() => void narrate('intro'), 700);
   };
 
   const handleContinue = () => {
@@ -108,6 +121,7 @@ export default function App() {
       ) : (
         <GameScreen onQuit={() => setScreen('title')} onRestart={handleStart} />
       )}
+      <Narrator />
     </div>
   );
 }
