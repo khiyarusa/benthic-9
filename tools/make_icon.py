@@ -183,8 +183,8 @@ for density, px in DENSITIES.items():
     write(os.path.join(target, "ic_launcher_round.png"), emblem(px))
     write(os.path.join(target, "ic_launcher_foreground.png"), emblem(int(px * 108 / 48), foreground_only=True))
 
-# adaptive icon background plate
-write(os.path.join(OUT, "drawable", "ic_launcher_background.png"), gradient(432).convert("RGBA"))
+# adaptive icon background is a colour resource (res/values/ic_launcher_background.xml);
+# writing a drawable PNG with the same name would collide with the vector drawable.
 
 # web + store assets
 write(os.path.join(WEB, "icons", "icon-192.png"), emblem(192))

@@ -52,7 +52,7 @@ APK در `android/app/build/outputs/apk/debug/app-debug.apk` ساخته می‌�
 
 - **ریلیز v0.3.0-alpha.1 (APK دیباگ):** https://github.com/khiyarusa/benthic-9/releases/tag/v0.3.0-alpha.1
 - مخزن خصوصی است؛ برای دانلود باید با حساب `khiyarusa` وارد شوی.
-- SHA-256 فایل APK: `8E11F3B3333F44636022E3B92EE014B065AF0B16FE6AAE0125DB6D2E300985E2`
+- SHA-256 فایل APK: `BEAA08F1AE264A9C49EB1D9FEB9E0A697BE9586F71E5FA84F6F2F4B6210206CB`
 
 ## وضعیت فعلی
 
