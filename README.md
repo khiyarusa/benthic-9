@@ -7,7 +7,12 @@
 
 | آموزش «اولین شیفت فرمانده» | نمای ایستگاه در ۲۰:۹ |
 |---|---|
-| ![آموزش](docs/screenshots/v4-coach-2.png) | ![ایستگاه](docs/screenshots/v3-wide-station.png) |
+| ![شیرجه](docs/screenshots/v5-dive.png) | ![آموزش](docs/screenshots/v4-coach-2.png) |
+
+## تازه در V5
+
+- شیرجهٔ واقعی ROV: پنج زیستگاه، کنترل لمسی، چراغ، سونار، کابل و باتری
+- نمونه و کشف واقعی که به انبار، پژوهش و گزارش ایستگاه اضافه می‌شود
 
 ## تازه در V4
 
@@ -56,7 +61,7 @@ APK در `android/app/build/outputs/apk/debug/app-debug.apk` ساخته می‌�
 
 ## دریافت بازی
 
-- **ریلیز v0.4.0-alpha.1 (APK دیباگ):** https://github.com/khiyarusa/benthic-9/releases/tag/v0.4.0-alpha.1
+- **ریلیز v0.5.0-alpha.1 (APK دیباگ):** https://github.com/khiyarusa/benthic-9/releases/tag/v0.5.0-alpha.1
 - مخزن خصوصی است؛ برای دانلود باید با حساب `khiyarusa` وارد شوی.
 - SHA-256 فایل APK: `BEAA08F1AE264A9C49EB1D9FEB9E0A697BE9586F71E5FA84F6F2F4B6210206CB`
 

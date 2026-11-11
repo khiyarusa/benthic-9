@@ -8,6 +8,8 @@ import { cancelResearch, startResearch, stepResearch } from './research';
 import { stepObjectives } from './objectives';
 import { dispatchPower } from './power';
 import { deployRov, recallRov, repairRov, stepRov } from './rov';
+import { applyDiveResult } from './dive';
+import type { DiveResult } from '../game/dive/DiveScene';
 import { stepThermal } from './thermal';
 import type { CrewTask, GameMode, GameState, RoomId, Speed } from './types';
 
@@ -215,6 +217,12 @@ export class BenthicSimulationCore {
     const result = deployRov(this.state, depth);
     this.emit();
     return result;
+  }
+
+  applyDive(result: DiveResult): { samples: number; data: number; discoveries: number } {
+    const outcome = applyDiveResult(this.state, result);
+    this.emit();
+    return outcome;
   }
 
   recallRov(): void {

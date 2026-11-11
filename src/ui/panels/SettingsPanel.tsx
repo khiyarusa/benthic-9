@@ -52,7 +52,7 @@ export function SettingsPanel({ onQuit }: { onQuit: () => void }) {
 
       <Section title="دربارهٔ بازی">
         <StatLine label="نام" value="BENTHIC-9 | بنتیک-۹" />
-        <StatLine label="نسخه" value="۰٫۴٫۰-alpha.1 — V4" />
+        <StatLine label="نسخه" value="۰٫۵٫۰-alpha.1 — V5" />
         <StatLine label="موتور" value="Phaser 4.2.1 + React 19 + TypeScript" />
         <StatLine label="عمق ایستگاه" value="۵۸۰۰ متر" />
         <p className="hint">

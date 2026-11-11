@@ -21,6 +21,7 @@ import { SettingsPanel } from '../panels/SettingsPanel';
 import { HelpPanel } from '../panels/HelpPanel';
 import { TutorialOverlay } from '../tutorial/TutorialOverlay';
 import { NextActionBar } from '../components/NextActionBar';
+import { DiveLauncher } from '../panels/DiveLauncher';
 
 const PANEL_TITLES: Record<PanelId, string> = {
   overview: 'نمای ایستگاه',
@@ -117,7 +118,8 @@ export function GameScreen({ onQuit, onRestart }: { onQuit: () => void; onRestar
       <div className="stage-area">
         <GameCanvas onSelectRoom={openRoom} />
         <NextActionBar onOpenRoom={openRoom} onOpenPanel={openPanel} />
-        <TutorialOverlay />
+      <TutorialOverlay />
+      <DiveLauncher />
       </div>
 
       <BottomNav

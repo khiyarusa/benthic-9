@@ -2,6 +2,7 @@ import { fa, faPercent } from '../../sim';
 import { rovDepthLimit } from '../../sim/rov';
 import { sim, useSim } from '../../state/store';
 import { Card, Chip, MetricBar, Section, StatLine } from '../components/ui';
+import { DiveEntry } from './DiveLauncher';
 
 export function ExplorationPanel() {
   useSim();
@@ -73,6 +74,8 @@ export function ExplorationPanel() {
           </p>
         </Section>
       )}
+
+      <DiveEntry />
 
       <Section title="گزارش آخرین سفر">
         <p className="hint">{rov.lastMissionResult ?? 'هنوز سفری انجام نشده است.'}</p>
