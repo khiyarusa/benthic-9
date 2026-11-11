@@ -3,11 +3,19 @@
 شبیه‌سازی بقا و مدیریت ایستگاه تحقیقاتی در عمق ۵۸۰۰ متری اقیانوس آرام.
 بازی ابتدا وب است و با Capacitor به اپلیکیشن اندروید (فقط افقی) تبدیل می‌شود.
 
-![نمای ایستگاه](docs/screenshots/v2-station.png)
+![نمای ایستگاه](docs/screenshots/v3-phone-station.png)
 
-| آموزش «اولین شیفت فرمانده» | پنل اتاق |
+| آموزش «اولین شیفت فرمانده» | نمای ایستگاه در ۲۰:۹ |
 |---|---|
-| ![آموزش](docs/screenshots/v2-tutorial.png) | ![اتاق](docs/screenshots/v2-room.png) |
+| ![آموزش](docs/screenshots/v3-tutorial.png) | ![ایستگاه](docs/screenshots/v3-wide-station.png) |
+
+## تازه در V3
+
+- رندر در وضوح واقعی صفحه (DPR) و رفع نرمی تصویر روی گوشی
+- صحنهٔ بازنویسی‌شده روی بافت‌های پخته: بدنهٔ شناور، برج فرمان، نورافکن، ۱۰ اتاق نقاشی‌شده
+- خدمهٔ پیکسلی متحرک و دکور کارگاهی در همهٔ اتاق‌ها
+- نوار «اقدام بعدی» که از وضعیت واقعی شبیه‌سازی محاسبه می‌شود
+- آیکون و اسپلش اختصاصی
 
 ## تازه در V2
 
@@ -42,7 +50,7 @@ APK در `android/app/build/outputs/apk/debug/app-debug.apk` ساخته می‌�
 
 ## دریافت بازی
 
-- **ریلیز v0.2.0-alpha.1 (APK دیباگ):** https://github.com/khiyarusa/benthic-9/releases/tag/v0.2.0-alpha.1
+- **ریلیز v0.3.0-alpha.1 (APK دیباگ):** https://github.com/khiyarusa/benthic-9/releases/tag/v0.3.0-alpha.1
 - مخزن خصوصی است؛ برای دانلود باید با حساب `khiyarusa` وارد شوی.
 - SHA-256 فایل APK: `8E11F3B3333F44636022E3B92EE014B065AF0B16FE6AAE0125DB6D2E300985E2`
 

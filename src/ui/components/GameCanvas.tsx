@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type Phaser from 'phaser';
-import { createGame } from '../../game/createGame';
+import { createGame, currentDpr } from '../../game/createGame';
 import { setRoomSelectHandler } from '../../game/bridge';
 import type { RoomId } from '../../sim/types';
 
@@ -37,11 +37,12 @@ export function GameCanvas({ onSelectRoom }: { onSelectRoom: (room: RoomId) => v
       const target = hostRef.current;
       game = createGame(target);
       observer = new ResizeObserver(() => {
+        const cssW = Math.max(320, target.clientWidth);
+        const cssH = Math.max(220, target.clientHeight);
         if (!target.clientWidth || !target.clientHeight) return;
-        game?.scale.resize(
-          Math.max(320, target.clientWidth),
-          Math.max(240, target.clientHeight),
-        );
+        const dpr = currentDpr();
+        game?.registry.set('dpr', dpr);
+        game?.scale.resize(Math.round(cssW * dpr), Math.round(cssH * dpr));
       });
       observer.observe(target);
     };

@@ -47,8 +47,14 @@ export function TutorialOverlay() {
       saveTutorialProgress(next);
       return next;
     });
-    window.dispatchEvent(new CustomEvent('benthic:close-overlays'));
-  }, []);
+    // Only dismiss open sheets when the next target lives outside them,
+    // otherwise the player loses the panel the lesson is about.
+    const upcoming = TUTORIAL_STEPS[Math.min(progress.index + 1, TUTORIAL_STEPS.length - 1)];
+    const target = upcoming?.target ?? '';
+    if (!target.startsWith('.sheet') && !target.startsWith('[data-room')) {
+      window.dispatchEvent(new CustomEvent('benthic:close-overlays'));
+    }
+  }, [progress.index]);
 
   const skip = useCallback(() => {
     persist({ index: TUTORIAL_STEPS.length, done: true, paused: false });
@@ -165,7 +171,12 @@ export function TutorialOverlay() {
               {progress.index === TUTORIAL_STEPS.length - 1 ? 'پایان آموزش' : 'ادامه'}
             </button>
           ) : (
-            <span className="tutorial-card__waiting">در انتظار انجام کار…</span>
+            <>
+              <button type="button" className="btn btn--sm btn--primary" onClick={advance}>
+                انجام دادم، بعدی
+              </button>
+              <span className="tutorial-card__waiting">یا خودِ کار را انجام بده…</span>
+            </>
           )}
           <button type="button" className="btn btn--sm btn--ghost" onClick={pause}>
             توقف

@@ -20,6 +20,7 @@ import { ReportsPanel } from '../panels/ReportsPanel';
 import { SettingsPanel } from '../panels/SettingsPanel';
 import { HelpPanel } from '../panels/HelpPanel';
 import { TutorialOverlay } from '../tutorial/TutorialOverlay';
+import { NextActionBar } from '../components/NextActionBar';
 
 const PANEL_TITLES: Record<PanelId, string> = {
   overview: 'نمای ایستگاه',
@@ -113,9 +114,11 @@ export function GameScreen({ onQuit, onRestart }: { onQuit: () => void; onRestar
     <>
       <TopBar onOpenLog={() => openPanel('log')} />
 
-      <GameCanvas onSelectRoom={openRoom} />
-
-      <span className="stage__hint">برای بررسی اتاق، روی آن ضربه بزن</span>
+      <div className="stage-area">
+        <GameCanvas onSelectRoom={openRoom} />
+        <NextActionBar onOpenRoom={openRoom} onOpenPanel={openPanel} />
+        <TutorialOverlay />
+      </div>
 
       <BottomNav
         active={room ? null : panel}
@@ -141,8 +144,6 @@ export function GameScreen({ onQuit, onRestart }: { onQuit: () => void; onRestar
           {content}
         </Sheet>
       ) : null}
-
-      <TutorialOverlay />
 
       {state.victory && !victoryDismissed ? (
         <div className="modal-center">

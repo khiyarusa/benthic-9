@@ -12,6 +12,10 @@ export interface StationLayout {
   height: number;
   rooms: Record<RoomId, Rect>;
   corridorBand: Rect;
+  /** visible water strip above the cutaway that shows the vessel's outer hull */
+  exterior: Rect;
+  /** everything below the exterior strip */
+  body: Rect;
   pad: number;
   gap: number;
   roomW: number;
@@ -43,39 +47,44 @@ export function computeLayout(width: number, height: number): StationLayout {
   const w = Math.max(360, width);
   const h = Math.max(220, height);
 
-  const pad = clamp(Math.round(Math.min(w, h) * 0.022), 6, 18);
-  const gap = clamp(Math.round(Math.min(w, h) * 0.016), 5, 14);
-  const corridorH = clamp(Math.round(h * 0.13), 40, 84);
+  const pad = clamp(Math.round(Math.min(w, h) * 0.032), 8, 20);
+  const gap = clamp(Math.round(Math.min(w, h) * 0.014), 4, 10);
+  const exteriorH = clamp(Math.round(h * 0.19), 34, 68);
+  const top = exteriorH + Math.round(gap * 0.6);
+  const bottom = h - pad;
+  const corridorH = clamp(Math.round((bottom - top) * 0.14), 26, 56);
   const roomW = (w - pad * 2 - gap * 4) / 5;
-  const roomH = (h - pad * 2 - corridorH - gap * 2) / 2;
+  const roomH = (bottom - top - corridorH - gap * 2) / 2;
 
   const rooms = {} as Record<RoomId, Rect>;
   UPPER.forEach((id, index) => {
-    rooms[id] = { x: pad + index * (roomW + gap), y: pad, w: roomW, h: roomH };
+    rooms[id] = { x: pad + index * (roomW + gap), y: top, w: roomW, h: roomH };
   });
   LOWER.forEach((id, index) => {
     rooms[id] = {
       x: pad + index * (roomW + gap),
-      y: pad + roomH + gap + corridorH + gap,
+      y: top + roomH + gap + corridorH + gap,
       w: roomW,
       h: roomH,
     };
   });
-  rooms.corridor = { x: pad, y: pad + roomH + gap, w: roomW * 4 + gap * 3, h: corridorH };
-  rooms.rov = { x: pad + 4 * (roomW + gap), y: pad, w: roomW, h: h - pad * 2 };
+  rooms.corridor = { x: pad, y: top + roomH + gap, w: roomW * 4 + gap * 3, h: corridorH };
+  rooms.rov = { x: pad + 4 * (roomW + gap), y: top, w: roomW, h: bottom - top };
 
   return {
     width: w,
     height: h,
     rooms,
     corridorBand: rooms.corridor,
+    exterior: { x: 0, y: 0, w, h: exteriorH },
+    body: { x: 0, y: top, w, h: bottom - top },
     pad,
     gap,
     roomW,
     roomH,
     corridorH,
-    labelFont: Math.round(clamp(roomW / 15, 10, 19)),
-    tinyFont: Math.round(clamp(roomW / 24, 8, 13)),
+    labelFont: Math.round(clamp(roomW / 13, 9, 14)),
+    tinyFont: Math.round(clamp(roomW / 24, 7, 11)),
     compact: roomW < 150,
   };
 }
