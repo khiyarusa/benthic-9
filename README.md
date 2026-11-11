@@ -42,9 +42,9 @@ APK در `android/app/build/outputs/apk/debug/app-debug.apk` ساخته می‌�
 
 ## دریافت بازی
 
-- **ریلیز v0.1.0 (APK دیباگ):** https://github.com/khiyarusa/benthic-9/releases/tag/v0.1.0
+- **ریلیز v0.2.0-alpha.1 (APK دیباگ):** https://github.com/khiyarusa/benthic-9/releases/tag/v0.2.0-alpha.1
 - مخزن خصوصی است؛ برای دانلود باید با حساب `khiyarusa` وارد شوی.
-- SHA-256 فایل APK: `9F0B4A2ED7AF5314DF200F43E53B576B2C15809AC9C25F1648E36631B710B4B1`
+- SHA-256 فایل APK: `8E11F3B3333F44636022E3B92EE014B065AF0B16FE6AAE0125DB6D2E300985E2`
 
 ## وضعیت فعلی
 
