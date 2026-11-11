@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { deleteSave } from '../../sim/save';
 import { isAudioEnabled, playConfirm, setAudioEnabled } from '../../audio/sfx';
 import { sim, useSim } from '../../state/store';

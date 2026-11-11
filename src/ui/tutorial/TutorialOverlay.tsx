@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { sim, useSim } from '../../state/store';
 import { countOf, subscribeTelemetry } from '../../state/telemetry';
 import { focusRoom } from '../../game/bridge';

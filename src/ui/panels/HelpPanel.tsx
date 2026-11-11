@@ -1,4 +1,4 @@
-﻿import { restartTutorial, resumeTutorial } from '../tutorial/TutorialOverlay';
+import { restartTutorial, resumeTutorial } from '../tutorial/TutorialOverlay';
 import { loadTutorialProgress } from '../tutorial/steps';
 import { Section } from '../components/ui';
 
