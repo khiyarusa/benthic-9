@@ -1,4 +1,13 @@
-export type PanelId = 'overview' | 'power' | 'life' | 'crew' | 'storage' | 'research' | 'rov' | 'log';
+export type PanelId =
+  | 'overview'
+  | 'power'
+  | 'life'
+  | 'crew'
+  | 'storage'
+  | 'research'
+  | 'rov'
+  | 'log'
+  | 'help';
 
 interface NavItem {
   id: PanelId;
@@ -15,6 +24,7 @@ const ITEMS: NavItem[] = [
   { id: 'research', glyph: '⌬', label: 'پژوهش' },
   { id: 'rov', glyph: '◈', label: 'اکتشاف' },
   { id: 'log', glyph: '✎', label: 'گزارش' },
+  { id: 'help', glyph: '؟', label: 'راهنما' },
 ];
 
 export function BottomNav({
@@ -34,6 +44,7 @@ export function BottomNav({
           <button
             key={item.id}
             type="button"
+            data-panel={item.id}
             className={`nav-btn ${active === item.id ? 'is-active' : ''}`}
             onClick={() => onSelect(item.id)}
             aria-pressed={active === item.id}

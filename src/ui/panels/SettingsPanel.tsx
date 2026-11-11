@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { deleteSave } from '../../sim/save';
 import { isAudioEnabled, playConfirm, setAudioEnabled } from '../../audio/sfx';
 import { sim, useSim } from '../../state/store';
@@ -52,7 +52,7 @@ export function SettingsPanel({ onQuit }: { onQuit: () => void }) {
 
       <Section title="دربارهٔ بازی">
         <StatLine label="نام" value="BENTHIC-9 | بنتیک-۹" />
-        <StatLine label="نسخه" value="۰٫۱٫۰ — ساخت وب پایه" />
+        <StatLine label="نسخه" value="۰٫۲٫۰-alpha.1 — V2" />
         <StatLine label="موتور" value="Phaser 4.2.1 + React 19 + TypeScript" />
         <StatLine label="عمق ایستگاه" value="۵۸۰۰ متر" />
         <p className="hint">

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { playAlarm, playClick } from '../audio/sfx';
+import { isAudioEnabled, playAlarm, playClick, setAmbientIntensity, startAmbient } from '../audio/sfx';
 import { saveGame, savedAt } from '../sim/save';
+import { stationAlerts } from '../sim/derived';
 import type { GameMode } from '../sim/types';
 import { continueGame, sim, startNewGame } from '../state/store';
 import { GameScreen } from './screens/GameScreen';
@@ -42,6 +43,25 @@ export default function App() {
       if (!last || Date.now() - last > AUTOSAVE_INTERVAL_MS) saveGame(state);
     }, 5000);
     return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const startAudio = () => {
+      if (isAudioEnabled()) startAmbient();
+      document.removeEventListener('pointerdown', startAudio);
+    };
+    document.addEventListener('pointerdown', startAudio);
+
+    const intensity = window.setInterval(() => {
+      const alerts = stationAlerts(sim.state);
+      const critical = alerts.filter((alert) => alert.level === 'critical').length;
+      setAmbientIntensity(Math.min(1, critical * 0.35 + (alerts.length > 0 ? 0.15 : 0)));
+    }, 2500);
+
+    return () => {
+      document.removeEventListener('pointerdown', startAudio);
+      window.clearInterval(intensity);
+    };
   }, []);
 
   useEffect(() => {

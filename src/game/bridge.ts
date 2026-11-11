@@ -1,13 +1,23 @@
 import type { RoomId } from '../sim/types';
 
-type RoomSelectHandler = (room: RoomId) => void;
+type RoomHandler = (room: RoomId) => void;
 
-let handler: RoomSelectHandler | null = null;
+let selectHandler: RoomHandler | null = null;
+let focusHandler: RoomHandler | null = null;
 
-export function setRoomSelectHandler(next: RoomSelectHandler | null): void {
-  handler = next;
+export function setRoomSelectHandler(next: RoomHandler | null): void {
+  selectHandler = next;
 }
 
 export function selectRoom(room: RoomId): void {
-  handler?.(room);
+  selectHandler?.(room);
+}
+
+/** Ask the Phaser scene to highlight and pulse a room (used by the tutorial). */
+export function setRoomFocusHandler(next: RoomHandler | null): void {
+  focusHandler = next;
+}
+
+export function focusRoom(room: RoomId): void {
+  focusHandler?.(room);
 }

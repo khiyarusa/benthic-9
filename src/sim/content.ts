@@ -1,4 +1,4 @@
-﻿import type {
+import type {
   CrewMember,
   Equipment,
   IncidentDefinition,
@@ -8,7 +8,7 @@
   RoomId,
 } from './types';
 
-export const GAME_VERSION = 1;
+export const GAME_VERSION = 2;
 export const SAVE_KEY = 'benthic9.save.v1';
 export const START_DEPTH_M = 5800;
 export const SEAWATER_DENSITY = 1025; // kg/m3 at deep-ocean conditions

@@ -19,11 +19,26 @@ export function serialize(state: GameState): string {
 
 export function deserialize(raw: string): GameState | null {
   try {
-    const parsed = JSON.parse(raw) as GameState;
+    const parsed = JSON.parse(raw) as GameState & { version?: number };
     if (!parsed || typeof parsed !== 'object') return null;
-    if (parsed.version !== GAME_VERSION) return null;
     if (!parsed.rooms || !parsed.equipment || !Array.isArray(parsed.crew)) return null;
     if (typeof parsed.minute !== 'number' || typeof parsed.depthM !== 'number') return null;
+
+    // Player saves from the first release must keep working (directive rule 6).
+    if (parsed.version === 1) {
+      parsed.version = GAME_VERSION;
+      if (typeof parsed.hullIntegrity !== 'number') {
+        const rooms = Object.values(parsed.rooms);
+        parsed.hullIntegrity = rooms.length
+          ? rooms.reduce((sum, room) => sum + room.hull, 0) / rooms.length
+          : 100;
+      }
+      for (const room of Object.values(parsed.rooms)) {
+        if (!room.breachSize) room.breachSize = room.breached ? 0.5 : 0;
+      }
+    }
+
+    if (parsed.version !== GAME_VERSION) return null;
     return parsed;
   } catch {
     return null;

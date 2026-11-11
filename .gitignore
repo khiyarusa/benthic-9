@@ -32,3 +32,6 @@ android/app/src/main/assets/capacitor.plugins.json
 keystore.properties
 .env
 .env.*
+
+artifacts/
+

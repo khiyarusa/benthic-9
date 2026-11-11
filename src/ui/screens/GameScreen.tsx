@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ROOM_LABEL, fa, stationClock } from '../../sim';
 import { stationAlerts } from '../../sim/derived';
 import { sim, useSim } from '../../state/store';
+import { track } from '../../state/telemetry';
 import type { GameMode, RoomId } from '../../sim/types';
 import { BottomNav, type PanelId } from '../components/BottomNav';
 import { GameCanvas } from '../components/GameCanvas';
@@ -17,6 +18,8 @@ import { ResearchPanel } from '../panels/ResearchPanel';
 import { ExplorationPanel } from '../panels/ExplorationPanel';
 import { ReportsPanel } from '../panels/ReportsPanel';
 import { SettingsPanel } from '../panels/SettingsPanel';
+import { HelpPanel } from '../panels/HelpPanel';
+import { TutorialOverlay } from '../tutorial/TutorialOverlay';
 
 const PANEL_TITLES: Record<PanelId, string> = {
   overview: 'نمای ایستگاه',
@@ -27,6 +30,7 @@ const PANEL_TITLES: Record<PanelId, string> = {
   research: 'پژوهش و فناوری',
   rov: 'اکتشاف با ROV',
   log: 'گزارش‌ها و تنظیمات',
+  help: 'راهنمای فرمانده',
 };
 
 const MODE_LABEL: Record<GameMode, string> = {
@@ -40,25 +44,38 @@ export function GameScreen({ onQuit, onRestart }: { onQuit: () => void; onRestar
   const state = sim.state;
   const [panel, setPanel] = useState<PanelId | null>(null);
   const [room, setRoom] = useState<RoomId | null>(null);
-  const [briefingOpen, setBriefingOpen] = useState(
-    state.minute === 0 && !state.flags.briefed && state.mode === 'campaign',
-  );
   const [logTab, setLogTab] = useState<'reports' | 'settings'>('reports');
   const [victoryDismissed, setVictoryDismissed] = useState(false);
 
   const alerts = stationAlerts(state);
   const criticalCount = alerts.filter((alert) => alert.level === 'critical').length;
 
+  useEffect(() => {
+    const closeAll = () => {
+      setPanel(null);
+      setRoom(null);
+    };
+    window.addEventListener('benthic:close-overlays', closeAll);
+    return () => window.removeEventListener('benthic:close-overlays', closeAll);
+  }, []);
+
   const openPanel = (id: PanelId) => {
     setRoom(null);
     setLogTab('reports');
+    track(`panel:${id}`);
     setPanel((current) => (current === id ? null : id));
+  };
+
+  const openRoom = (id: RoomId) => {
+    setPanel(null);
+    setRoom(id);
+    track('room:open');
   };
 
   const content = (() => {
     switch (panel) {
       case 'overview':
-        return <OverviewPanel onOpenRoom={(id) => { setPanel(null); setRoom(id); }} onOpenPanel={openPanel} />;
+        return <OverviewPanel onOpenRoom={openRoom} onOpenPanel={openPanel} />;
       case 'power':
         return <PowerPanel />;
       case 'life':
@@ -71,6 +88,8 @@ export function GameScreen({ onQuit, onRestart }: { onQuit: () => void; onRestar
         return <ResearchPanel />;
       case 'rov':
         return <ExplorationPanel />;
+      case 'help':
+        return <HelpPanel />;
       case 'log':
         return (
           <div>
@@ -94,19 +113,17 @@ export function GameScreen({ onQuit, onRestart }: { onQuit: () => void; onRestar
     <>
       <TopBar onOpenLog={() => openPanel('log')} />
 
-      <GameCanvas
-        onSelectRoom={(id) => {
-          setPanel(null);
-          setRoom(id);
-        }}
-      />
+      <GameCanvas onSelectRoom={openRoom} />
 
       <span className="stage__hint">برای بررسی اتاق، روی آن ضربه بزن</span>
 
       <BottomNav
         active={room ? null : panel}
         onSelect={openPanel}
-        badge={{ overview: criticalCount, log: Math.min(9, state.incidents.filter((entry) => entry.minute > state.minute - 60).length) }}
+        badge={{
+          overview: criticalCount,
+          log: Math.min(9, state.incidents.filter((entry) => entry.minute > state.minute - 60).length),
+        }}
       />
 
       {room ? (
@@ -116,42 +133,16 @@ export function GameScreen({ onQuit, onRestart }: { onQuit: () => void; onRestar
       ) : null}
 
       {panel ? (
-        <Sheet title={PANEL_TITLES[panel]} onClose={() => setPanel(null)} extra={<span className="chip">{MODE_LABEL[state.mode]}</span>}>
+        <Sheet
+          title={PANEL_TITLES[panel]}
+          onClose={() => setPanel(null)}
+          extra={<span className="chip">{MODE_LABEL[state.mode]}</span>}
+        >
           {content}
         </Sheet>
       ) : null}
 
-      {briefingOpen ? (
-        <div className="modal-center">
-          <div className="modal-card">
-            <h3>ایستگاه بنتیک-۹ — جلسهٔ توجیهی</h3>
-            <p>
-              فرمانده، ساعت {stationClock(state.minute).label} است. ارتباط با سطح قطع شده و
-              سه سامانهٔ حیاتی وضعیت پایدار ندارند. خدمهٔ تو چهار نفرند: مهندس، زیست‌شناس،
-              زمین‌شناس و پزشک.
-            </p>
-            <ul className="hint" style={{ paddingInlineStart: 18, margin: '0 0 14px' }}>
-              <li>روی اتاق‌ها ضربه بزن تا وضعیت واقعی هر اتاق را ببینی.</li>
-              <li>با پنل برق، اولویت مصرف را تعیین کن؛ کمبود برق پمپ‌ها را ضعیف می‌کند.</li>
-              <li>ترک بدنه را با «مهار ترک» به مهندس بسپار؛ آب را با پمپ‌ها تخلیه کن.</li>
-              <li>برای پژوهش، داده لازم است؛ سفر ROV داده و نمونه می‌آورد.</li>
-            </ul>
-            <div className="row" style={{ justifyContent: 'flex-end', gap: 6 }}>
-              <button
-                type="button"
-                className="btn btn--primary"
-                onClick={() => {
-                  state.flags.briefed = true;
-                  setBriefingOpen(false);
-                  sim.start();
-                }}
-              >
-                شروع مأموریت
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      <TutorialOverlay />
 
       {state.victory && !victoryDismissed ? (
         <div className="modal-center">
@@ -185,7 +176,7 @@ export function GameScreen({ onQuit, onRestart }: { onQuit: () => void; onRestar
             </div>
             <p className="hint" style={{ marginTop: 10 }}>
               دوام: {fa(state.minute)} دقیقهٔ بازی • تعمیرها: {fa(state.stats.repairs)} • رویدادهای
-              مهارشده: {fa(state.stats.incidentsResolved)}
+              مهارشده: {fa(state.stats.incidentsResolved)} • {stationClock(state.minute).label}
             </p>
           </div>
         </div>
