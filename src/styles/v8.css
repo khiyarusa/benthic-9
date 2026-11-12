@@ -1,0 +1,178 @@
+/* ---------- V8: compact coach on short landscape phones ---------- */
+
+.coach {
+  width: min(240px, 38vw);
+  padding: 6px 7px 5px;
+  border-radius: 5px;
+}
+
+.coach__head {
+  gap: 6px;
+}
+
+.coach__titles strong {
+  font-size: 11px;
+  line-height: 1.15;
+}
+
+.coach__titles span {
+  font-size: 9px;
+}
+
+.coach__icon {
+  width: 20px;
+  height: 20px;
+  font-size: 13px;
+}
+
+.coach__body {
+  margin-top: 4px;
+}
+
+.coach__body p {
+  font-size: 10px;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.coach__foot {
+  margin-top: 5px;
+  gap: 4px;
+}
+
+.coach__foot .btn {
+  min-height: 26px;
+  padding: 0 8px;
+  font-size: 10px;
+}
+
+.coach__dots i {
+  width: 3px;
+  height: 3px;
+}
+
+.guide-portrait {
+  border-radius: 50%;
+  border: 1px solid rgba(79, 224, 230, 0.55);
+  object-fit: cover;
+  object-position: 50% 20%;
+  flex: 0 0 auto;
+}
+
+@media (min-width: 900px) {
+  .coach {
+    width: min(300px, 30vw);
+  }
+  .coach__body p {
+    font-size: 11.5px;
+    -webkit-line-clamp: 3;
+  }
+  .coach__titles strong {
+    font-size: 12.5px;
+  }
+}
+
+/* the coach card is the only voice on screen while it is open */
+body[data-coach='on'] .narrator {
+  display: none;
+}
+
+/* the coach card itself must stay readable above the veil */
+.coach,
+.coach-pill {
+  z-index: 74;
+}
+
+/* ---------- V8: interactive equipment markers ---------- */
+
+.hotspots {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+.hotspot__label {
+  max-width: 104px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hotspot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 6px 2px 4px;
+  border: 1px solid rgba(79, 224, 230, 0.45);
+  border-radius: 999px;
+  background: rgba(3, 16, 22, 0.82);
+  color: #dff4f8;
+  font-family: inherit;
+  font-size: 9.5px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.hotspot__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #6fe3a6;
+  box-shadow: 0 0 7px rgba(111, 227, 166, 0.9);
+}
+
+.hotspot.is-warn {
+  border-color: rgba(255, 138, 90, 0.6);
+}
+
+.hotspot.is-warn .hotspot__dot {
+  background: #ff8a5a;
+  box-shadow: 0 0 8px rgba(255, 138, 90, 0.9);
+  animation: hotspot-blink 1.4s ease-in-out infinite;
+}
+
+.hotspot.is-off .hotspot__dot {
+  background: #6b7c85;
+  box-shadow: none;
+}
+
+.hotspot small {
+  color: rgba(206, 234, 240, 0.7);
+  font-size: 8.5px;
+}
+
+@keyframes hotspot-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.equip-card__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 11.5px;
+}
+
+.equip-card__row strong.is-good { color: #6fe3a6; }
+.equip-card__row strong.is-warn { color: #ffd39a; }
+
+/* on a narrow render the machine labels collapse to markers */
+@media (max-width: 620px) {
+  .hotspot__label {
+    display: none;
+  }
+  .hotspot {
+    padding: 0;
+    width: 22px;
+    height: 22px;
+    justify-content: center;
+    border-radius: 50%;
+  }
+}

@@ -77,7 +77,7 @@ export function TitleScreen({
       </div>
 
       <footer className="title-foot">
-        <span>BENTHIC-9 · v0.7.0</span>
+        <span>BENTHIC-9 · v0.8.0</span>
         <span>ساختهٔ امین · تلگرام @Mozrd · روبیکا @angosht0</span>
       </footer>
 

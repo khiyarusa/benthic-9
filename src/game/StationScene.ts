@@ -458,10 +458,19 @@ export class StationScene extends Phaser.Scene {
         const spread = Math.min(rect.w * 0.36, 46);
         const targetX = rect.x + rect.w / 2 + ((index % 2 === 0 ? -1 : 1) * spread) / 2;
         const targetY = rect.y + rect.h - 26;
-        marker.x += (targetX - marker.x) * Math.min(1, 0.16);
-        marker.y += (targetY - marker.y) * Math.min(1, 0.16);
+        const stepX = (targetX - marker.x) * Math.min(1, 0.16);
+        const stepY = (targetY - marker.y) * Math.min(1, 0.16);
+        marker.x += stepX;
+        marker.y += stepY;
+        const speed = Math.hypot(stepX, stepY);
+        // a small vertical bob while walking: the marker reads as a person
+        // moving through the room instead of a sticker sliding on glass
+        const bob = speed > 0.35 ? 1 + Math.sin(this.elapsed * 9 + index) * 0.045 : 1;
+        marker.setScale(0.34 * bob);
+        marker.setFlipX(stepX < -0.05 ? true : stepX > 0.05 ? false : marker.flipX);
         const tired = member.energy < 25 || member.health < 50;
-        marker.setAlpha(tired ? 0.75 : 1);
+        const working = member.task.kind !== 'idle';
+        marker.setAlpha(tired ? 0.72 : working ? 0.96 + Math.sin(this.elapsed * 3) * 0.04 : 1);
         return;
       }
       const sprite = this.crewSprites.get(member.id);

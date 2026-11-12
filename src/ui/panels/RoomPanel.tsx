@@ -5,6 +5,7 @@ import { roomCondition } from '../../sim/crew';
 import { describeTask, equipmentCondition } from '../labels';
 import { sim, useSim } from '../../state/store';
 import { Chip, EmptyNote, MetricBar, Section, StatLine, Toggle } from '../components/ui';
+import { EquipmentHotspots } from './EquipmentHotspots';
 import type { RoomId } from '../../sim/types';
 
 const TABS = [
@@ -55,6 +56,7 @@ export function RoomPanel({ roomId }: { roomId: RoomId }) {
         {flood > 0.02 ? (
           <div className="room-hero__flood" style={{ height: `${18 + flood * 52}%` }} aria-hidden="true" />
         ) : null}
+        {units.length > 0 ? <EquipmentHotspots roomId={roomId} units={units} /> : null}
         <figcaption>
           <strong>{ROOM_LABEL[roomId]}</strong>
           <span>

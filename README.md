@@ -9,6 +9,13 @@
 |---|---|
 | ![شیرجه](docs/screenshots/v5-dive.png) | ![آموزش](docs/screenshots/v4-coach-2.png) |
 
+## تازه در V8
+
+- رفع باگ واقعی گوشی: سفیدی نوار پایین و بلور پس‌زمینه (سایهٔ ۹۹۹۹px و backdrop-filter)
+- میزکار تمام‌صفحه برای هر بخش با شاخص‌های زنده
+- مارکر تجهیزات روی تصویر اتاق؛ هر دستگاه قابل لمس و روشن/خاموش
+- کارت آموزش ۹.۸٪ صفحه با پرترهٔ واقعی و بدون هم‌پوشانی
+
 ## تازه در V7
 
 - ده رندر نیمه‌واقعی برای اتاق‌ها، بدنهٔ بیرونی و پرترهٔ خدمه — داخل بازی، نه در سند
@@ -76,7 +83,7 @@ APK در `android/app/build/outputs/apk/debug/app-debug.apk` ساخته می‌�
 
 ## دریافت بازی
 
-- **ریلیز v0.7.0 (APK دیباگ):** https://github.com/khiyarusa/benthic-9/releases/tag/v0.7.0
+- **ریلیز v0.8.0 (APK دیباگ):** https://github.com/khiyarusa/benthic-9/releases/tag/v0.8.0
 - مخزن خصوصی است؛ برای دانلود باید با حساب `khiyarusa` وارد شوی.
 - SHA-256 فایل APK: `BEAA08F1AE264A9C49EB1D9FEB9E0A697BE9586F71E5FA84F6F2F4B6210206CB`
 

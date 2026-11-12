@@ -7,6 +7,7 @@ import type { GameMode, RoomId } from '../../sim/types';
 import { BottomNav, type PanelId } from '../components/BottomNav';
 import { GameCanvas } from '../components/GameCanvas';
 import { Sheet } from '../components/Sheet';
+import { Workspace } from '../components/Workspace';
 import { TopBar } from '../components/TopBar';
 import { OverviewPanel } from '../panels/OverviewPanel';
 import { RoomPanel } from '../panels/RoomPanel';
@@ -158,13 +159,14 @@ export function GameScreen({ onQuit, onRestart }: { onQuit: () => void; onRestar
       ) : null}
 
       {panel ? (
-        <Sheet
+        <Workspace
+          panel={panel}
           title={PANEL_TITLES[panel]}
           onClose={() => setPanel(null)}
           extra={<span className="chip">{MODE_LABEL[state.mode]}</span>}
         >
           {content}
-        </Sheet>
+        </Workspace>
       ) : null}
 
       {state.victory && !victoryDismissed ? (

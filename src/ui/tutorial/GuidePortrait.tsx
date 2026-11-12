@@ -1,20 +1,14 @@
-import { useMemo } from 'react';
-import { paintPortrait } from '../../game/art/crew';
-
-/**
- * Pixel-art portrait of آرمان, generated from the same painter as the in-world
- * sprite so the face on the card is the face in the station.
- */
+/** Photographic portrait of the commander who narrates the tutorial. */
 export function GuidePortrait({ size = 34 }: { size?: number }) {
-  const url = useMemo(() => paintPortrait(48).toDataURL('image/png'), []);
   return (
     <img
-      src={url}
+      src="crew/crew-c1.webp"
       width={size}
       height={size}
-      alt="آرمان کیانی، مهندس ارشد"
+      alt="آرین رادمهر، فرمانده و مهندس ارشد"
       className="guide-portrait"
       style={{ width: size, height: size }}
+      loading="lazy"
     />
   );
 }

@@ -22,12 +22,12 @@ test.describe('campaign direction and codex', () => {
     await page.locator('.navbar .nav-btn[data-panel="missions"]').click();
     await expect(page.locator('.board-act')).toHaveCount(3);
     await expect(page.locator('.board-item')).toHaveCount(12);
-    await page.locator('.sheet__close').first().click();
+    await page.locator('.workspace__close').first().click();
 
     await page.locator('.navbar .nav-btn[data-panel="codex"]').click();
     await expect(page.locator('.codex-card')).toHaveCount(11);
     await expect(page.locator('.codex-card--locked').first()).toBeVisible();
-    await page.locator('.sheet__close').first().click();
+    await page.locator('.workspace__close').first().click();
 
     // advanced mode reveals the technical panels, basic mode hides them
     const basicCount = await page.locator('.navbar .nav-btn').count();

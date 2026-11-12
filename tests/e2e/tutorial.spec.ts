@@ -44,7 +44,7 @@ test.describe('first shift coaching', () => {
     // the taught action really advances the tutorial
     await crew.click();
     await expect(page.locator('.coach')).toContainText('وضعیت ایستگاه', { timeout: 6000 });
-    await expect(page.locator('.sheet')).toBeVisible();
+    await expect(page.locator('.workspace')).toBeVisible();
   });
 
   test('can be minimized, skipped and stays skipped after reload', async ({ page }) => {

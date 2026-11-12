@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
+import { createPortal } from 'react-dom';
 import { sim, useSim } from '../../state/store';
 import { countOf, subscribeTelemetry } from '../../state/telemetry';
 import { focusRoom } from '../../game/bridge';
@@ -6,19 +7,42 @@ import { tutorial } from './engine';
 import { GuidePortrait } from './GuidePortrait';
 import { TutorialCard } from './TutorialCard';
 
-/** Spotlight that dims the surroundings without blocking the target. */
-function Spotlight({ rect }: { rect: DOMRect }) {
+/**
+ * Dimming veil built from four solid rectangles around the target.
+ *
+ * The previous implementation used `box-shadow: 0 0 0 9999px`, which the
+ * Android WebView compositor rasterises into a gigantic layer: on phones that
+ * produced white bands at the bottom of the screen and a blurry backdrop.
+ * Four plain rects are cheap, exact and have no texture-size limits.
+ */
+function CoachVeil({ rect }: { rect: DOMRect }) {
+  const pad = 5;
+  const left = Math.max(0, rect.left - pad);
+  const top = Math.max(0, rect.top - pad);
+  const right = Math.min(window.innerWidth, rect.right + pad);
+  const bottom = Math.min(window.innerHeight, rect.bottom + pad);
+  const shade = 'rgba(1, 7, 11, 0.52)';
+
   return (
-    <div
-      className="coach-spot"
-      style={{
-        left: Math.max(0, rect.left - 5),
-        top: Math.max(0, rect.top - 5),
-        width: rect.width + 10,
-        height: rect.height + 10,
-      }}
-      aria-hidden="true"
-    />
+    <>
+      <div className="coach-veil" style={{ left: 0, top: 0, width: '100%', height: top, background: shade }} aria-hidden="true" />
+      <div
+        className="coach-veil"
+        style={{ left: 0, top: bottom, width: '100%', height: Math.max(0, window.innerHeight - bottom), background: shade }}
+        aria-hidden="true"
+      />
+      <div
+        className="coach-veil"
+        style={{ left: 0, top, width: left, height: Math.max(0, bottom - top), background: shade }}
+        aria-hidden="true"
+      />
+      <div
+        className="coach-veil"
+        style={{ left: right, top, width: Math.max(0, window.innerWidth - right), height: Math.max(0, bottom - top), background: shade }}
+        aria-hidden="true"
+      />
+      <div className="coach-spot" style={{ left, top, width: right - left, height: bottom - top }} aria-hidden="true" />
+    </>
   );
 }
 
@@ -71,6 +95,15 @@ export function TutorialOverlay() {
 
   const advance = useCallback(() => tutorial.advance(), []);
 
+  // the coach owns the screen while it is visible; narrating over it caused
+  // two overlapping text panels on a phone
+  useEffect(() => {
+    document.body.dataset.coach = step ? 'on' : 'off';
+    return () => {
+      document.body.dataset.coach = 'off';
+    };
+  }, [step]);
+
   // completion detection: real telemetry event or real simulation state
   useEffect(() => {
     if (!step || step.completion.manual) return;
@@ -98,9 +131,9 @@ export function TutorialOverlay() {
     );
   }
 
-  return (
+  return createPortal(
     <>
-      {target ? <Spotlight rect={target} /> : null}
+      {target ? <CoachVeil rect={target} /> : null}
       <TutorialCard
         step={step}
         index={progress.index}
@@ -110,7 +143,8 @@ export function TutorialOverlay() {
         onSkip={() => tutorial.skip()}
         onMinimize={() => tutorial.minimize()}
       />
-    </>
+    </>,
+    document.body,
   );
 }
 

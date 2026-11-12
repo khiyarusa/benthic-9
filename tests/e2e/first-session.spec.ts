@@ -36,9 +36,9 @@ test.describe('BENTHIC-9 first session', () => {
 
     // management panels
     await page.getByRole('button', { name: 'برق', exact: true }).click();
-    await expect(page.locator('.sheet__title')).toContainText('مدیریت برق');
+    await expect(page.locator('.workspace__titles h2')).toContainText('مدیریت برق');
     await expect(page.getByRole('button', { name: 'راه‌اندازی مجدد' })).toBeDisabled();
-    await page.locator('.sheet__close').click();
+    await page.locator('.workspace__close').click();
 
     // room drill-down from the station overview
     await page.getByRole('button', { name: 'ایستگاه', exact: true }).click();
